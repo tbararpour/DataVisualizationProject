@@ -60,21 +60,23 @@
             const x = d3.scaleLog().domain([10, 150]).range([0, width]);
             const y = d3.scaleLog().domain([10, 150]).range([height, 0]);
 
+            // Add x-axis
             svg.append('g')
                 .attr('transform', 'translate(0,' + height + ')')
                 .call(d3.axisBottom(x).tickValues([10, 20, 50, 100]).tickFormat(d3.format("~s")))
                 .append('text')
                 .attr('class', 'axis-label')
                 .attr('x', width / 2)
-                .attr('y', margin - 10)
+                .attr('y', 40)
                 .attr('text-anchor', 'middle')
                 .text('Average City MPG');
 
+            // Add y-axis
             svg.append('g')
                 .call(d3.axisLeft(y).tickValues([10, 20, 50, 100]).tickFormat(d3.format("~s")))
                 .append('text')
                 .attr('class', 'axis-label')
-                .attr('x', -margin)
+                .attr('x', -40)
                 .attr('y', -margin / 2)
                 .attr('text-anchor', 'middle')
                 .attr('transform', 'rotate(-90)')
