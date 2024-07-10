@@ -48,7 +48,8 @@ async function init() {
        .append('circle')
        .attr('cx', d => x(d.AverageCityMPG))
        .attr('cy', d => y(d.AverageHighwayMPG))
-       .attr('r', d => 2 + d.EngineCylinders);
+       .attr('r', d => 2 + d.EngineCylinders)
+        .style('fill', 'red');
 
     // Add x-axis
     const xAxis = d3.axisBottom(x)
