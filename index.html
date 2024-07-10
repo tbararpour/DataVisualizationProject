@@ -5,11 +5,13 @@
     <style> 
         circle { fill: red; stroke: black; }
         .triangle { fill: blue; stroke: black; }
+        .square { fill: green; stroke: black; }
     </style>
 </head>
 <body onload='init()'>
     <button onclick="showCircles()">Slide 1</button>
     <button onclick="showTriangles()">Slide 2</button>
+    <button onclick="showSquares()">Slide 3</button>
     <svg width=300 height=300></svg>
     <script>
     async function init() {
@@ -130,6 +132,38 @@
            .attr('transform', d => `translate(${x(d.AverageCityMPG)},${y(d.AverageHighwayMPG)})`)
            .style('fill', 'blue');
     }
+
+    function showSquares() {
+        // Clear existing shapes
+        svg.selectAll("*").remove();
+
+        // Redraw axes
+        const xAxis = d3.axisBottom(x)
+                        .tickValues([10, 20, 50, 100])
+                        .tickFormat(d3.format("~s"));
+
+        svg.append('g')
+           .attr('transform', 'translate(0,' + 200 + ')')
+           .call(xAxis);
+
+        const yAxis = d3.axisLeft(y)
+                        .tickValues([10, 20, 50, 100])
+                        .tickFormat(d3.format("~s"));
+
+        svg.append('g')
+           .call(yAxis);
+
+        // Add squares
+        svg.selectAll('.square')
+           .data(chartData)
+           .enter()
+           .append('path')
+           .attr('class', 'square')
+           .attr('d', d3.symbol().type(d3.symbolSquare).size(d => (2 + d.EngineCylinders) * 20))
+           .attr('transform', d => `translate(${x(d.AverageCityMPG)},${y(d.AverageHighwayMPG)})`)
+           .style('fill', 'green');
+    }
+
     </script>
 </body>
 </html>
