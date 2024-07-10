@@ -73,13 +73,14 @@
         showCircles();
     }
 
-    function createAnnotations(type) {
+    function createAnnotations() {
         // Define annotations
         const annotations = [
             {
                 note: {
                     label: "This is a high efficiency vehicle",
-                    title: "High Efficiency"
+                    title: "High Efficiency",
+                    wrap: 200
                 },
                 x: window.x(50),
                 y: window.y(50),
@@ -89,7 +90,8 @@
             {
                 note: {
                     label: "This vehicle has a lot of cylinders",
-                    title: "High Cylinders"
+                    title: "High Cylinders",
+                    wrap: 200
                 },
                 x: window.x(15),
                 y: window.y(30),
@@ -99,8 +101,8 @@
         ];
 
         const makeAnnotations = d3.annotation()
-            .annotations(annotations)
-            .type(type);
+            .type(d3.annotationLabel)
+            .annotations(annotations);
 
         window.svg.append("g")
             .attr("class", "annotation-group")
@@ -138,7 +140,7 @@
            .style('fill', 'red');
 
         // Add annotations
-        createAnnotations(d3.annotationCalloutCircle);
+        createAnnotations();
     }
 
     function showTriangles() {
@@ -172,7 +174,7 @@
            .style('fill', 'blue');
 
         // Add annotations
-        createAnnotations(d3.annotationCalloutCircle);
+        createAnnotations();
     }
 
     function showSquares() {
@@ -206,7 +208,7 @@
            .style('fill', 'green');
 
         // Add annotations
-        createAnnotations(d3.annotationCalloutCircle);
+        createAnnotations();
     }
 
     </script>
