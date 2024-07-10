@@ -1,1 +1,23 @@
-<h1>hello</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+</head>
+<body onload="init()">
+<script>
+async function init() {
+    // Load and parse the CSV data
+    const data = await d3.csv('https://flunky.github.io/cars2017.csv', d => {
+        return {
+            AverageCityMPG: +d.AverageCityMPG,
+            AverageHighwayMPG: +d.AverageHighwayMPG,
+            EngineCylinders: +d.EngineCylinders
+        };
+    });
+
+    // Log the loaded data to the console to verify
+    console.log("Data loaded: ", data);
+}
+</script>
+</body>
+</html>
