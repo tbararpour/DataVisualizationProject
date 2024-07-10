@@ -2,10 +2,12 @@
 <html>
 <head>
     <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://unpkg.com/d3-svg-annotation@2.5.1/dist/d3-annotation.min.js"></script>
     <style> 
         circle { fill: red; stroke: black; }
         .triangle { fill: blue; stroke: black; }
         .square { fill: green; stroke: black; }
+        .annotation { font-size: 12px; font-family: Arial, sans-serif; }
     </style>
 </head>
 <body onload='init()'>
@@ -71,8 +73,42 @@
         showCircles();
     }
 
+    function createAnnotations(type) {
+        // Define annotations
+        const annotations = [
+            {
+                note: {
+                    label: "This is a high efficiency vehicle",
+                    title: "High Efficiency"
+                },
+                x: window.x(50),
+                y: window.y(50),
+                dy: -30,
+                dx: 30
+            },
+            {
+                note: {
+                    label: "This vehicle has a lot of cylinders",
+                    title: "High Cylinders"
+                },
+                x: window.x(15),
+                y: window.y(30),
+                dy: -30,
+                dx: 30
+            }
+        ];
+
+        const makeAnnotations = d3.annotation()
+            .annotations(annotations)
+            .type(type);
+
+        window.svg.append("g")
+            .attr("class", "annotation-group")
+            .call(makeAnnotations);
+    }
+
     function showCircles() {
-        // Clear existing shapes
+        // Clear existing shapes and annotations
         svg.selectAll("*").remove();
 
         // Redraw axes
@@ -100,10 +136,13 @@
            .attr('cy', d => y(d.AverageHighwayMPG))
            .attr('r', d => 2 + d.EngineCylinders)
            .style('fill', 'red');
+
+        // Add annotations
+        createAnnotations(d3.annotationCalloutCircle);
     }
 
     function showTriangles() {
-        // Clear existing shapes
+        // Clear existing shapes and annotations
         svg.selectAll("*").remove();
 
         // Redraw axes
@@ -131,10 +170,13 @@
            .attr('d', d3.symbol().type(d3.symbolTriangle).size(d => (2 + d.EngineCylinders) * 20))
            .attr('transform', d => `translate(${x(d.AverageCityMPG)},${y(d.AverageHighwayMPG)})`)
            .style('fill', 'blue');
+
+        // Add annotations
+        createAnnotations(d3.annotationCalloutCircle);
     }
 
     function showSquares() {
-        // Clear existing shapes
+        // Clear existing shapes and annotations
         svg.selectAll("*").remove();
 
         // Redraw axes
@@ -162,6 +204,9 @@
            .attr('d', d3.symbol().type(d3.symbolSquare).size(d => (2 + d.EngineCylinders) * 20))
            .attr('transform', d => `translate(${x(d.AverageCityMPG)},${y(d.AverageHighwayMPG)})`)
            .style('fill', 'green');
+
+        // Add annotations
+        createAnnotations(d3.annotationCalloutCircle);
     }
 
     </script>
