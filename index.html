@@ -2,17 +2,17 @@
 <html>
 <head>
     <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-svg-annotation/2.5.1/d3-annotation.min.js"></script>
     <style>
-        .annotation { font-size: 12px; font-family: Arial, sans-serif; }
-        circle { fill: red; stroke: black; }
+        circle { stroke: black; }
         .triangle { fill: blue; stroke: black; }
-        .square { fill: green; stroke: black; }
+        .annotation { font-size: 12px; font-family: Arial, sans-serif; }
     </style>
 </head>
 <body onload='init()'>
     <button onclick="showCircles()">Slide 1</button>
-    <button onclick="showScatterPlot()">Slide 2</button>
-    <button onclick="showSquares()">Slide 3</button>
+    <button onclick="showTriangles()">Slide 2</button>
+    <button onclick="showPieChart()">Slide 3</button>
     <svg width=600 height=400></svg>
     <script>
     async function init() {
@@ -21,7 +21,10 @@
             return {
                 AverageCityMPG: +d.AverageCityMPG,
                 AverageHighwayMPG: +d.AverageHighwayMPG,
-                EngineCylinders: +d.EngineCylinders
+                EngineCylinders: +d.EngineCylinders,
+                EngineDisplacement: +d.EngineDisplacement,
+                Horsepower: +d.Horsepower,
+                Make: d.Make
             };
         });
 
@@ -44,6 +47,12 @@
                     .range([height, 0])
                     .base(10);
 
+        window.size = d3.scaleLinear()
+                       .domain(d3.extent(data, d => d.EngineCylinders))
+                       .range([5, 20]);
+
+        window.color = d3.scaleOrdinal(d3.schemeCategory10);
+
         // Create SVG canvas
         window.svg = d3.select('svg')
                       .attr('width', width + margin.left + margin.right)
@@ -58,13 +67,7 @@
 
         svg.append('g')
            .attr('transform', 'translate(0,' + height + ')')
-           .call(xAxis)
-           .append('text')
-           .attr('class', 'axis-label')
-           .attr('x', width)
-           .attr('y', -6)
-           .style('text-anchor', 'end')
-           .text('Average City MPG');
+           .call(xAxis);
 
         // Add y-axis
         const yAxis = d3.axisLeft(y)
@@ -72,17 +75,9 @@
                         .tickFormat(d3.format("~s"));
 
         svg.append('g')
-           .call(yAxis)
-           .append('text')
-           .attr('class', 'axis-label')
-           .attr('transform', 'rotate(-90)')
-           .attr('x', -6)
-           .attr('y', 6)
-           .attr('dy', '.71em')
-           .style('text-anchor', 'end')
-           .text('Average Highway MPG');
+           .call(yAxis);
 
-        // Show circles by default
+        // Show bubbles by default
         showCircles();
     }
 
@@ -113,17 +108,13 @@
             }
         ];
 
-        const annotationGroup = window.svg.append("g")
-            .attr("class", "annotation-group");
+        const makeAnnotations = d3.annotation()
+            .type(d3.annotationLabel)
+            .annotations(annotations);
 
-        annotationGroup.selectAll("text")
-            .data(annotations)
-            .enter()
-            .append("text")
-            .attr("class", "annotation")
-            .attr("x", d => d.x + d.dx)
-            .attr("y", d => d.y + d.dy)
-            .text(d => d.note.title + ": " + d.note.label);
+        window.svg.append("g")
+            .attr("class", "annotation-group")
+            .call(makeAnnotations);
     }
 
     function showCircles() {
@@ -146,21 +137,23 @@
         svg.append('g')
            .call(yAxis);
 
-        // Add circles
+        // Add bubbles
         svg.selectAll('circle')
            .data(chartData)
            .enter()
            .append('circle')
-           .attr('cx', d => x(d.AverageCityMPG))
-           .attr('cy', d => y(d.AverageHighwayMPG))
-           .attr('r', d => 2 + d.EngineCylinders)
-           .style('fill', 'red');
+           .attr('cx', d => x(d.EngineDisplacement))
+           .attr('cy', d => y(d.Horsepower))
+           .attr('r', d => size(d.EngineCylinders))
+           .style('fill', d => color(d.Make))
+           .append('title')  // Tooltip
+           .text(d => `${d.Make}\nEngine Displacement: ${d.EngineDisplacement}\nHorsepower: ${d.Horsepower}\nEngine Cylinders: ${d.EngineCylinders}`);
 
         // Add annotations
         createAnnotations();
     }
 
-    function showScatterPlot() {
+    function showTriangles() {
         // Clear existing shapes and annotations
         svg.selectAll("*").remove();
 
@@ -180,49 +173,48 @@
         svg.append('g')
            .call(yAxis);
 
-        // Add scatter plot circles
-        svg.selectAll('circle')
+        // Add triangles
+        svg.selectAll('.triangle')
            .data(chartData)
            .enter()
-           .append('circle')
-           .attr('cx', d => x(d.AverageCityMPG))
-           .attr('cy', d => y(d.AverageHighwayMPG))
-           .attr('r', d => 2 + d.EngineCylinders)
+           .append('path')
+           .attr('class', 'triangle')
+           .attr('d', d3.symbol().type(d3.symbolTriangle).size(d => (2 + d.EngineCylinders) * 20))
+           .attr('transform', d => `translate(${x(d.AverageCityMPG)},${y(d.AverageHighwayMPG)})`)
            .style('fill', 'blue');
 
         // Add annotations
         createAnnotations();
     }
 
-    function showSquares() {
+    function showPieChart() {
         // Clear existing shapes and annotations
         svg.selectAll("*").remove();
 
-        // Redraw axes
-        const xAxis = d3.axisBottom(x)
-                        .tickValues([10, 20, 50, 100])
-                        .tickFormat(d3.format("~s"));
+        const pie = d3.pie()
+                      .value(d => d.EngineCylinders);
 
-        svg.append('g')
-           .attr('transform', 'translate(0,' + 300 + ')')
-           .call(xAxis);
+        const arc = d3.arc()
+                      .innerRadius(0)
+                      .outerRadius(100);
 
-        const yAxis = d3.axisLeft(y)
-                        .tickValues([10, 20, 50, 100])
-                        .tickFormat(d3.format("~s"));
+        const pieData = pie(chartData);
 
-        svg.append('g')
-           .call(yAxis);
+        const arcs = svg.selectAll(".arc")
+                        .data(pieData)
+                        .enter()
+                        .append("g")
+                        .attr("class", "arc")
+                        .attr("transform", `translate(${window.width / 2}, ${window.height / 2})`);
 
-        // Add squares
-        svg.selectAll('.square')
-           .data(chartData)
-           .enter()
-           .append('path')
-           .attr('class', 'square')
-           .attr('d', d3.symbol().type(d3.symbolSquare).size(d => (2 + d.EngineCylinders) * 20))
-           .attr('transform', d => `translate(${x(d.AverageCityMPG)},${y(d.AverageHighwayMPG)})`)
-           .style('fill', 'green');
+        arcs.append("path")
+            .attr("d", arc)
+            .style("fill", (d, i) => color(i));
+
+        arcs.append("text")
+            .attr("transform", d => `translate(${arc.centroid(d)})`)
+            .attr("dy", "0.35em")
+            .text(d => d.data.Make);
 
         // Add annotations
         createAnnotations();
