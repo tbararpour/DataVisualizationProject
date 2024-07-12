@@ -191,17 +191,33 @@
         // Clear existing shapes and annotations
         svg.selectAll("*").remove();
 
+        // Aggregate data for the pie chart
+        const aggregatedData = d3.nest()
+            .key(d => d.Make)
+            .rollup(values => d3.sum(values, d => d.EngineCylinders))
+            .entries(chartData);
+
+        const sortedData = aggregatedData.sort((a, b) => b.value - a.value);
+
+        const topData = sortedData.slice(0, 10);
+        const otherData = {
+            key: "Others",
+            value: d3.sum(sortedData.slice(10), d => d.value)
+        };
+
+        const pieData = topData.concat(otherData);
+
         const pie = d3.pie()
-                      .value(d => d.EngineCylinders);
+                      .value(d => d.value);
 
         const arc = d3.arc()
                       .innerRadius(0)
                       .outerRadius(100);
 
-        const pieData = pie(chartData);
+        const pieArcs = pie(pieData);
 
         const arcs = svg.selectAll(".arc")
-                        .data(pieData)
+                        .data(pieArcs)
                         .enter()
                         .append("g")
                         .attr("class", "arc")
@@ -214,7 +230,7 @@
         arcs.append("text")
             .attr("transform", d => `translate(${arc.centroid(d)})`)
             .attr("dy", "0.35em")
-            .text(d => d.data.Make);
+            .text(d => d.data.key);
 
         // Add annotations
         createAnnotations();
