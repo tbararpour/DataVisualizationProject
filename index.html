@@ -9,7 +9,7 @@
 </head>
 <body onload='init()'>
     <button onclick="showBarChart()">Slide 1</button>
-    <button onclick="showTriangles()">Slide 2</button>
+    <button onclick="showCircles()">Slide 2</button>
     <button onclick="showPieChart()">Slide 3</button>
     <svg width=800 height=400></svg>
     <script>
@@ -187,24 +187,28 @@
         createAnnotations();
     }
 
-    function showTriangles() {
+    function showCircles() {
         // Clear existing shapes and annotations
         svg.selectAll("*").remove();
 
         // Redraw axes
-        const xAxis = d3.axisBottom(x0);
+        const xAxis = d3.axisBottom(x)
+                        .tickValues([10, 20, 50, 100])
+                        .tickFormat(d3.format("~s"));
 
         svg.append('g')
-           .attr('transform', 'translate(0,' + 300 + ')')
+           .attr('transform', 'translate(0,' + 200 + ')')
            .call(xAxis);
 
-        const yAxis = d3.axisLeft(y);
+        const yAxis = d3.axisLeft(y)
+                        .tickValues([10, 20, 50, 100])
+                        .tickFormat(d3.format("~s"));
 
         svg.append('g')
            .call(yAxis);
 
-        // Add triangles
-        svg.selectAll('.circle')
+        // Add circles
+        svg.selectAll('circle')
            .data(chartData)
            .enter()
            .append('circle')
