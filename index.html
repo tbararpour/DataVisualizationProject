@@ -13,7 +13,7 @@
 </head>
 <body onload='init()'>
     <button onclick="showCircles()">Slide 1</button>
-    <button onclick="showLineChart()">Slide 2</button>
+    <button onclick="showScatterPlot()">Slide 2</button>
     <button onclick="showSquares()">Slide 3</button>
     <svg width=600 height=400></svg>
     <script>
@@ -158,7 +158,7 @@
         createAnnotations();
     }
 
-    function showLineChart() {
+    function showScatterPlot() {
         // Clear existing shapes and annotations
         svg.selectAll("*").remove();
 
@@ -178,16 +178,15 @@
         svg.append('g')
            .call(yAxis);
 
-        // Define the line
-        const line = d3.line()
-                       .x(d => x(d.AverageCityMPG))
-                       .y(d => y(d.AverageHighwayMPG));
-
-        // Add the line path
-        svg.append('path')
-           .datum(chartData)
-           .attr('class', 'line')
-           .attr('d', line);
+        // Add circles for scatter plot
+        svg.selectAll('circle')
+           .data(chartData)
+           .enter()
+           .append('circle')
+           .attr('cx', d => x(d.AverageCityMPG))
+           .attr('cy', d => y(d.AverageHighwayMPG))
+           .attr('r', d => 2 + d.EngineCylinders)
+           .style('fill', 'blue');
 
         // Add annotations
         createAnnotations();
