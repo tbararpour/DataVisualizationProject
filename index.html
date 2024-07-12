@@ -11,7 +11,7 @@
     <button onclick="showBarChart()">Slide 1</button>
     <button onclick="showTriangles()">Slide 2</button>
     <button onclick="showPieChart()">Slide 3</button>
-    <svg width=600 height=400></svg>
+    <svg width=800 height=400></svg>
     <script>
     async function init() {
         // Load and parse the CSV data
@@ -28,8 +28,8 @@
         window.chartData = data;
 
         // Set margins and dimensions
-        const margin = {top: 50, right: 50, bottom: 150, left: 50};
-        const width = 500;
+        const margin = {top: 50, right: 150, bottom: 150, left: 50};
+        const width = 600;
         const height = 300;
 
         // Create scales
@@ -161,6 +161,27 @@
             .attr("width", x1.bandwidth())
             .attr("height", d => 300 - y(d.value))
             .style("fill", d => color(d.key));
+
+        // Add legend
+        const legend = svg.selectAll(".legend")
+                          .data(x1.domain())
+                          .enter()
+                          .append("g")
+                          .attr("class", "legend")
+                          .attr("transform", (d, i) => `translate(${width + 20}, ${i * 20})`);
+
+        legend.append("rect")
+              .attr("x", 0)
+              .attr("width", 18)
+              .attr("height", 18)
+              .style("fill", d => color(d));
+
+        legend.append("text")
+              .attr("x", 24)
+              .attr("y", 9)
+              .attr("dy", ".35em")
+              .style("text-anchor", "start")
+              .text(d => `${d} cylinders`);
 
         // Add annotations
         createAnnotations();
