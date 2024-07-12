@@ -204,14 +204,14 @@
            .call(yAxis);
 
         // Add triangles
-        svg.selectAll('.triangle')
+        svg.selectAll('.circle')
            .data(chartData)
            .enter()
-           .append('path')
-           .attr('class', 'triangle')
-           .attr('d', d3.symbol().type(d3.symbolTriangle).size(d => (2 + d.EngineCylinders) * 20))
-           .attr('transform', d => `translate(${x0(d.Make)},${y(d.AverageHighwayMPG)})`)
-           .style('fill', 'blue');
+           .append('circle')
+           .attr('cx', d => x(d.AverageCityMPG))
+           .attr('cy', d => y(d.AverageHighwayMPG))
+           .attr('r', d => 2 + d.EngineCylinders)
+           .style('fill', 'red');
 
         // Add annotations
         createAnnotations();
