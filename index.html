@@ -73,6 +73,9 @@
     }
 
     function createAnnotations() {
+        // Clear existing annotations
+        svg.selectAll(".annotation-group").remove();
+
         // Define custom annotations
         const annotations = [
             {
@@ -99,14 +102,14 @@
                 .attr("transform", `translate(${annotation.x},${annotation.y})`);
 
             g.append("text")
-                .attr("x", annotation.dx)
-                .attr("y", annotation.dy)
-                .attr("class", "annotation-label")
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("class", "annotation-title")
                 .text(annotation.title);
 
             g.append("text")
-                .attr("x", annotation.dx)
-                .attr("y", annotation.dy + 15)
+                .attr("x", 0)
+                .attr("y", 15)
                 .attr("class", "annotation-text")
                 .text(annotation.text);
         });
