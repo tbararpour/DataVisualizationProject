@@ -4,13 +4,11 @@
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-svg-annotation/2.5.1/d3-annotation.min.js"></script>
     <style>
-        circle { stroke: black; }
-        .triangle { fill: blue; stroke: black; }
         .annotation { font-size: 12px; font-family: Arial, sans-serif; }
     </style>
 </head>
 <body onload='init()'>
-    <button onclick="showCircles()">Slide 1</button>
+    <button onclick="showBarChart()">Slide 1</button>
     <button onclick="showTriangles()">Slide 2</button>
     <button onclick="showPieChart()">Slide 3</button>
     <svg width=600 height=400></svg>
@@ -22,8 +20,6 @@
                 AverageCityMPG: +d.AverageCityMPG,
                 AverageHighwayMPG: +d.AverageHighwayMPG,
                 EngineCylinders: +d.EngineCylinders,
-                EngineDisplacement: +d.EngineDisplacement,
-                Horsepower: +d.Horsepower,
                 Make: d.Make
             };
         });
@@ -32,24 +28,24 @@
         window.chartData = data;
 
         // Set margins and dimensions
-        const margin = {top: 50, right: 50, bottom: 50, left: 50};
+        const margin = {top: 50, right: 50, bottom: 150, left: 50};
         const width = 500;
         const height = 300;
 
         // Create scales
-        window.x = d3.scaleLog()
-                    .domain([10, 150])
-                    .range([0, width])
-                    .base(10);
+        window.x0 = d3.scaleBand()
+                      .domain(data.map(d => d.Make))
+                      .range([0, width])
+                      .padding(0.1);
 
-        window.y = d3.scaleLog()
-                    .domain([10, 150])
-                    .range([height, 0])
-                    .base(10);
+        window.x1 = d3.scaleBand()
+                      .domain([...new Set(data.map(d => d.EngineCylinders))])
+                      .range([0, x0.bandwidth()])
+                      .padding(0.05);
 
-        window.size = d3.scaleLinear()
-                       .domain(d3.extent(data, d => d.EngineCylinders))
-                       .range([5, 20]);
+        window.y = d3.scaleLinear()
+                     .domain([0, d3.max(data, d => d.AverageHighwayMPG)])
+                     .range([height, 0]);
 
         window.color = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -61,24 +57,26 @@
                       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
         // Add x-axis
-        const xAxis = d3.axisBottom(x)
-                        .tickValues([10, 20, 50, 100])
-                        .tickFormat(d3.format("~s"));
+        const xAxis = d3.axisBottom(x0);
 
         svg.append('g')
            .attr('transform', 'translate(0,' + height + ')')
-           .call(xAxis);
+           .call(xAxis)
+           .selectAll("text")
+           .attr("y", 0)
+           .attr("x", 9)
+           .attr("dy", ".35em")
+           .attr("transform", "rotate(45)")
+           .style("text-anchor", "start");
 
         // Add y-axis
-        const yAxis = d3.axisLeft(y)
-                        .tickValues([10, 20, 50, 100])
-                        .tickFormat(d3.format("~s"));
+        const yAxis = d3.axisLeft(y);
 
         svg.append('g')
            .call(yAxis);
 
-        // Show bubbles by default
-        showCircles();
+        // Show bar chart by default
+        showBarChart();
     }
 
     function createAnnotations() {
@@ -90,7 +88,7 @@
                     title: "High Efficiency",
                     wrap: 200
                 },
-                x: window.x(50),
+                x: window.x0("BMW"),
                 y: window.y(50),
                 dy: -30,
                 dx: 30
@@ -101,7 +99,7 @@
                     title: "High Cylinders",
                     wrap: 200
                 },
-                x: window.x(15),
+                x: window.x0("Ford"),
                 y: window.y(30),
                 dy: -30,
                 dx: 30
@@ -117,37 +115,52 @@
             .call(makeAnnotations);
     }
 
-    function showCircles() {
+    function showBarChart() {
         // Clear existing shapes and annotations
         svg.selectAll("*").remove();
 
         // Redraw axes
-        const xAxis = d3.axisBottom(x)
-                        .tickValues([10, 20, 50, 100])
-                        .tickFormat(d3.format("~s"));
+        const xAxis = d3.axisBottom(x0);
 
         svg.append('g')
            .attr('transform', 'translate(0,' + 300 + ')')
-           .call(xAxis);
+           .call(xAxis)
+           .selectAll("text")
+           .attr("y", 0)
+           .attr("x", 9)
+           .attr("dy", ".35em")
+           .attr("transform", "rotate(45)")
+           .style("text-anchor", "start");
 
-        const yAxis = d3.axisLeft(y)
-                        .tickValues([10, 20, 50, 100])
-                        .tickFormat(d3.format("~s"));
+        const yAxis = d3.axisLeft(y);
 
         svg.append('g')
            .call(yAxis);
 
-        // Add bubbles
-        svg.selectAll('circle')
-           .data(chartData)
-           .enter()
-           .append('circle')
-           .attr('cx', d => x(d.EngineDisplacement))
-           .attr('cy', d => y(d.Horsepower))
-           .attr('r', d => size(d.EngineCylinders))
-           .style('fill', d => color(d.Make))
-           .append('title')  // Tooltip
-           .text(d => `${d.Make}\nEngine Displacement: ${d.EngineDisplacement}\nHorsepower: ${d.Horsepower}\nEngine Cylinders: ${d.EngineCylinders}`);
+        // Aggregate data for the bar chart
+        const nestedData = d3.nest()
+            .key(d => d.Make)
+            .key(d => d.EngineCylinders)
+            .rollup(values => d3.mean(values, d => d.AverageHighwayMPG))
+            .entries(chartData);
+
+        // Add bars
+        const bars = svg.selectAll(".bar")
+                        .data(nestedData)
+                        .enter()
+                        .append("g")
+                        .attr("class", "bar")
+                        .attr("transform", d => `translate(${x0(d.key)},0)`);
+
+        bars.selectAll("rect")
+            .data(d => d.values)
+            .enter()
+            .append("rect")
+            .attr("x", d => x1(d.key))
+            .attr("y", d => y(d.value))
+            .attr("width", x1.bandwidth())
+            .attr("height", d => 300 - y(d.value))
+            .style("fill", d => color(d.key));
 
         // Add annotations
         createAnnotations();
@@ -158,17 +171,13 @@
         svg.selectAll("*").remove();
 
         // Redraw axes
-        const xAxis = d3.axisBottom(x)
-                        .tickValues([10, 20, 50, 100])
-                        .tickFormat(d3.format("~s"));
+        const xAxis = d3.axisBottom(x0);
 
         svg.append('g')
            .attr('transform', 'translate(0,' + 300 + ')')
            .call(xAxis);
 
-        const yAxis = d3.axisLeft(y)
-                        .tickValues([10, 20, 50, 100])
-                        .tickFormat(d3.format("~s"));
+        const yAxis = d3.axisLeft(y);
 
         svg.append('g')
            .call(yAxis);
@@ -180,7 +189,7 @@
            .append('path')
            .attr('class', 'triangle')
            .attr('d', d3.symbol().type(d3.symbolTriangle).size(d => (2 + d.EngineCylinders) * 20))
-           .attr('transform', d => `translate(${x(d.AverageCityMPG)},${y(d.AverageHighwayMPG)})`)
+           .attr('transform', d => `translate(${x0(d.Make)},${y(d.AverageHighwayMPG)})`)
            .style('fill', 'blue');
 
         // Add annotations
