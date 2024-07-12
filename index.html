@@ -2,10 +2,8 @@
 <html>
 <head>
     <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-svg-annotation/2.5.1/d3-annotation.min.js"></script>
     <style>
         .annotation { font-size: 12px; font-family: Arial, sans-serif; }
-        .line { fill: none; stroke: steelblue; stroke-width: 2px; }
         circle { fill: red; stroke: black; }
         .triangle { fill: blue; stroke: black; }
         .square { fill: green; stroke: black; }
@@ -115,13 +113,17 @@
             }
         ];
 
-        const makeAnnotations = d3.annotation()
-            .type(d3.annotationLabel)
-            .annotations(annotations);
+        const annotationGroup = window.svg.append("g")
+            .attr("class", "annotation-group");
 
-        window.svg.append("g")
-            .attr("class", "annotation-group")
-            .call(makeAnnotations);
+        annotationGroup.selectAll("text")
+            .data(annotations)
+            .enter()
+            .append("text")
+            .attr("class", "annotation")
+            .attr("x", d => d.x + d.dx)
+            .attr("y", d => d.y + d.dy)
+            .text(d => d.note.title + ": " + d.note.label);
     }
 
     function showCircles() {
@@ -178,7 +180,7 @@
         svg.append('g')
            .call(yAxis);
 
-        // Add circles for scatter plot
+        // Add scatter plot circles
         svg.selectAll('circle')
            .data(chartData)
            .enter()
