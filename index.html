@@ -12,7 +12,7 @@
     <button onclick="showBarChart()">Slide 1</button>
     <button onclick="showCircles()">Slide 2</button>
     <button onclick="showStackedBarChart()">Slide 3</button>
-    <svg width=1200 height=600></svg>
+    <svg width=1200 height=500></svg>
     <script>
     async function init() {
         // Load and parse the CSV data
@@ -31,8 +31,8 @@
 
         // Set margins and dimensions
         const margin = {top: 50, right: 150, bottom: 150, left: 50};
-        const width = 1000;
-        const height = 400;
+        const width = 1100; // 1200 - margins
+        const height = 400; // 500 - margins
 
         // Store dimensions globally
         window.width = width;
@@ -140,7 +140,7 @@
         const xAxis = d3.axisBottom(x0);
 
         svg.append('g')
-           .attr('transform', 'translate(0,' + 300 + ')')
+           .attr('transform', 'translate(0,' + height + ')')
            .call(xAxis)
            .selectAll("text")
            .attr("y", 0)
@@ -176,13 +176,13 @@
             .attr("x", d => x1(d.key))
             .attr("y", d => yBar(d.value))
             .attr("width", x1.bandwidth())
-            .attr("height", d => 300 - yBar(d.value))
+            .attr("height", d => height - yBar(d.value))
             .style("fill", d => color(d.key));
 
         // Add legend title
         svg.append("text")
             .attr("class", "legend-title")
-            .attr("x", 600 + 20)
+            .attr("x", width + 20)
             .attr("y", -10)
             .attr("text-anchor", "start")
             .style("font-weight", "bold")
@@ -194,7 +194,7 @@
                           .enter()
                           .append("g")
                           .attr("class", "legend")
-                          .attr("transform", (d, i) => `translate(${600 + 20}, ${i * 20})`);
+                          .attr("transform", (d, i) => `translate(${width + 20}, ${i * 20})`);
 
         legend.append("rect")
               .attr("x", 0)
@@ -223,7 +223,7 @@
                         .tickFormat(d3.format("~s"));
 
         svg.append('g')
-           .attr('transform', 'translate(0,' + 300 + ')')
+           .attr('transform', 'translate(0,' + height + ')')
            .call(xAxis);
 
         const yAxis = d3.axisLeft(yBubble)
@@ -251,7 +251,7 @@
         // Add legend for Fuel types
         svg.append("text")
             .attr("class", "legend-title")
-            .attr("x", 650)
+            .attr("x", width + 20)
             .attr("y", -10)
             .attr("text-anchor", "start")
             .style("font-weight", "bold")
@@ -265,7 +265,7 @@
                               .enter()
                               .append("g")
                               .attr("class", "legendFuel")
-                              .attr("transform", (d, i) => `translate(650, ${i * 20})`);
+                              .attr("transform", (d, i) => `translate(${width + 20}, ${i * 20})`);
 
         legendFuel.append("rect")
                   .attr("x", 0)
@@ -362,7 +362,7 @@
         // Add legend title
         svg.append("text")
             .attr("class", "legend-title")
-            .attr("x", 600 + 20)
+            .attr("x", width + 20)
             .attr("y", -10)
             .attr("text-anchor", "start")
             .style("font-weight", "bold")
@@ -374,7 +374,7 @@
             .enter()
             .append("g")
             .attr("class", "legend")
-            .attr("transform", (d, i) => `translate(${600 + 20}, ${i * 20})`);
+            .attr("transform", (d, i) => `translate(${width + 20}, ${i * 20})`);
 
         legend.append("rect")
             .attr("x", 0)
