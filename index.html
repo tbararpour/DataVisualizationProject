@@ -30,7 +30,7 @@
 
         // Set margins and dimensions
         const margin = {top: 70, right: 150, bottom: 70, left: 70};
-        const width = 1200; // 1300 - margins
+        const width = 1100; // 1200 - margins
         const height = 400; // 500 - margins
 
         // Store dimensions globally
@@ -79,28 +79,17 @@
         showBarChart();
     }
 
-    function createAnnotations() {
-        // Define annotations
-        const annotations = [
+    function createAnnotation() {
+        // Define annotation
+        const annotation = [
             {
                 note: {
-                    label: "This is a high efficiency vehicle",
-                    title: "High Efficiency",
+                    label: "Vehicles with 0 cylinders (electric vehicles) have the highest speed on the highway",
+                    title: "Highest Highway Speed",
                     wrap: 200
                 },
-                x: window.x0("BMW"),
-                y: window.yBar(50),
-                dy: -30,
-                dx: 30
-            },
-            {
-                note: {
-                    label: "This vehicle has a lot of cylinders",
-                    title: "High Cylinders",
-                    wrap: 200
-                },
-                x: window.x0("Ford"),
-                y: window.yBar(30),
+                x: window.x0("Tesla"), // Adjust the x position based on the Make that represents electric vehicles
+                y: window.yBar(70), // Assuming the highest speed is around 70
                 dy: -30,
                 dx: 30
             }
@@ -110,7 +99,7 @@
             .attr("class", "annotation-group");
 
         annotationGroup.selectAll("text")
-            .data(annotations)
+            .data(annotation)
             .enter()
             .append("text")
             .attr("class", "annotation")
@@ -220,8 +209,8 @@
               .style("text-anchor", "start")
               .text(function(d) { return `${d} cylinders`; });
 
-        // Add annotations
-        createAnnotations();
+        // Add annotation
+        createAnnotation();
     }
 
     function showCircles() {
@@ -316,7 +305,7 @@
                   .text(function(d) { return d; });
 
         // Add annotations
-        createAnnotations();
+        createAnnotation();
     }
 
     function showStackedBarChart() {
@@ -325,7 +314,7 @@
 
         // Add title
         svg.append("text")
-           .attr("x", width / 2)
+           .attr("x", (width * 0.75) / 2)
            .attr("y", -30)
            .attr("text-anchor", "middle")
            .style("font-size", "20px")
@@ -396,7 +385,7 @@
 
         svg.append('text')
            .attr('transform', 'rotate(-90)')
-           .attr('x', -(height * 0.75) / 2)
+           .attr('x', -(height * 0.75) / 2
            .attr('y', -60)
            .attr('text-anchor', 'middle')
            .style('font-size', '14px')
