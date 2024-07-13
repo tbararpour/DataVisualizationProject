@@ -186,7 +186,7 @@
 
         // Add legend
         const legend = svg.selectAll(".legend")
-                          .data(x1.domain())
+                          .data(x1.domain().sort((a, b) => a - b)) // Sort legend items by cylinder count
                           .enter()
                           .append("g")
                           .attr("class", "legend")
