@@ -41,7 +41,7 @@
                       .padding(0.1);
 
         window.x1 = d3.scaleBand()
-                      .domain([...new Set(data.map(d => d.EngineCylinders))])
+                      .domain([...new Set(data.map(d => d.EngineCylinders))].sort((a, b) => a - b))
                       .range([0, x0.bandwidth()])
                       .padding(0.05);
 
@@ -199,7 +199,6 @@
         // Add annotations
         createAnnotations();
     }
-
     function showCircles() {
         // Clear existing shapes and annotations
         svg.selectAll("*").remove();
