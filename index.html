@@ -280,55 +280,111 @@
         createAnnotations();
     }
 
-    function showPieChart() {
-        // Clear existing shapes and annotations
-        svg.selectAll("*").remove();
+function showStackedBarChart() {
+    // Clear existing shapes and annotations
+    svg.selectAll("*").remove();
 
-        // Aggregate data for the pie chart
-        const aggregatedData = d3.nest()
-            .key(d => d.Make)
-            .rollup(values => d3.sum(values, d => d.EngineCylinders))
-            .entries(chartData);
+    // Aggregate data for the stacked bar chart
+    const nestedData = d3.nest()
+        .key(d => d.EngineCylinders)
+        .key(d => d.Fuel)
+        .rollup(values => values.length)
+        .entries(chartData);
 
-        const sortedData = aggregatedData.sort((a, b) => b.value - a.value);
+    // Prepare data for stacking
+    const fuels = ['Electricity', 'Diesel', 'Gasoline'];
+    const stackData = nestedData.map(d => {
+        const obj = { EngineCylinders: d.key };
+        d.values.forEach(v => {
+            obj[v.key] = v.value;
+        });
+        return obj;
+    });
 
-        const topData = sortedData.slice(0, 10);
-        const otherData = {
-            key: "Others",
-            value: d3.sum(sortedData.slice(10), d => d.value)
-        };
+    const stack = d3.stack()
+        .keys(fuels)
+        .value((d, key) => d[key] || 0);
 
-        const pieData = topData.concat(otherData);
+    const series = stack(stackData);
 
-        const pie = d3.pie()
-                      .value(d => d.value);
+    // Create scales
+    const xStacked = d3.scaleBand()
+        .domain(stackData.map(d => d.EngineCylinders))
+        .range([0, width])
+        .padding(0.1);
 
-        const arc = d3.arc()
-                      .innerRadius(0)
-                      .outerRadius(100);
+    const yStacked = d3.scaleLinear()
+        .domain([0, d3.max(stackData, d => d3.sum(fuels.map(f => d[f] || 0)))])
+        .range([height, 0]);
 
-        const pieArcs = pie(pieData);
+    const colorStacked = d3.scaleOrdinal()
+        .domain(fuels)
+        .range(['green', 'brown', 'blue']);
 
-        const arcs = svg.selectAll(".arc")
-                        .data(pieArcs)
-                        .enter()
-                        .append("g")
-                        .attr("class", "arc")
-                        .attr("transform", `translate(${window.width / 2}, ${window.height / 2})`);
+    // Redraw axes
+    const xAxis = d3.axisBottom(xStacked);
 
-        arcs.append("path")
-            .attr("d", arc)
-            .style("fill", (d, i) => color(i));
+    svg.append('g')
+        .attr('transform', 'translate(0,' + height + ')')
+        .call(xAxis)
+        .selectAll("text")
+        .attr("y", 0)
+        .attr("x", 9)
+        .attr("dy", ".35em")
+        .attr("transform", "rotate(45)")
+        .style("text-anchor", "start");
 
-        arcs.append("text")
-            .attr("transform", d => `translate(${arc.centroid(d)})`)
-            .attr("dy", "0.35em")
-            .text(d => d.data.key);
+    const yAxis = d3.axisLeft(yStacked);
 
-        // Add annotations
-        createAnnotations();
-    }
+    svg.append('g')
+        .call(yAxis);
 
+    // Add bars
+    svg.append('g')
+        .selectAll('g')
+        .data(series)
+        .enter()
+        .append('g')
+        .attr('fill', d => colorStacked(d.key))
+        .selectAll('rect')
+        .data(d => d)
+        .enter()
+        .append('rect')
+        .attr('x', d => xStacked(d.data.EngineCylinders))
+        .attr('y', d => yStacked(d[1]))
+        .attr('height', d => yStacked(d[0]) - yStacked(d[1]))
+        .attr('width', xStacked.bandwidth());
+
+    // Add legend title
+    svg.append("text")
+        .attr("class", "legend-title")
+        .attr("x", 600 + 20)
+        .attr("y", -10)
+        .attr("text-anchor", "start")
+        .style("font-weight", "bold")
+        .text("Fuel Types");
+
+    // Add legend
+    const legend = svg.selectAll(".legend")
+        .data(fuels)
+        .enter()
+        .append("g")
+        .attr("class", "legend")
+        .attr("transform", (d, i) => `translate(${600 + 20}, ${i * 20})`);
+
+    legend.append("rect")
+        .attr("x", 0)
+        .attr("width", 18)
+        .attr("height", 18)
+        .style("fill", d => colorStacked(d));
+
+    legend.append("text")
+        .attr("x", 24)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .style("text-anchor", "start")
+        .text(d => d);
+}
     </script>
 </body>
 </html>
