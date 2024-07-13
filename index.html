@@ -2,7 +2,6 @@
 <html>
 <head>
     <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-svg-annotation/2.5.1/d3-annotation.min.js"></script>
     <style>
         circle { stroke: black; }
         .annotation { font-size: 12px; font-family: Arial, sans-serif; }
@@ -12,11 +11,11 @@
     <button onclick="showBarChart()">Slide 1</button>
     <button onclick="showCircles()">Slide 2</button>
     <button onclick="showStackedBarChart()">Slide 3</button>
-    <svg width=1200 height=500></svg>
+    <svg width=1300 height=600></svg>
     <script>
     async function init() {
         // Load and parse the CSV data
-        const data = await d3.csv('https://flunky.github.io/cars2017.csv', d => {
+        const data = await d3.csv('https://flunky.github.io/cars2017.csv', function(d) {
             return {
                 AverageCityMPG: +d.AverageCityMPG,
                 AverageHighwayMPG: +d.AverageHighwayMPG,
@@ -31,26 +30,29 @@
 
         // Set margins and dimensions
         const margin = {top: 50, right: 150, bottom: 150, left: 50};
-        const width = 1100; // 1200 - margins
-        const height = 400; // 500 - margins
+        const width = 1200; // 1300 - margins
+        const height = 500; // 600 - margins
 
         // Store dimensions globally
         window.width = width;
         window.height = height;
 
         // Create scales for bar chart
+        var makes = data.map(function(d) { return d.Make; }); // Extract the 'Make' values
         window.x0 = d3.scaleBand()
-                      .domain(data.map(d => d.Make))
-                      .range([0, width])
-                      .padding(0.1);
+                      .domain(makes) // Set the domain to the 'Make' values
+                      .range([0, width]) // Set the range to span the chart width
+                      .paddingInner(0.1); // Add padding between the bands
 
         window.x1 = d3.scaleBand()
-                      .domain([...new Set(data.map(d => d.EngineCylinders))].sort((a, b) => a - b))
+                      .domain(data.map(function(d) { return d.EngineCylinders; }).filter(function(value, index, self) {
+                          return self.indexOf(value) === index;
+                      }).sort(function(a, b) { return a - b; }))
                       .range([0, x0.bandwidth()])
                       .padding(0.05);
 
         window.yBar = d3.scaleLinear()
-                     .domain([0, d3.max(data, d => d.AverageHighwayMPG)])
+                     .domain([0, d3.max(data, function(d) { return d.AverageHighwayMPG; })])
                      .range([height, 0]);
 
         window.color = d3.scaleOrdinal(d3.schemeCategory10);
@@ -123,13 +125,17 @@
             }
         ];
 
-        const makeAnnotations = d3.annotation()
-            .type(d3.annotationLabel)
-            .annotations(annotations);
+        const annotationGroup = window.svg.append("g")
+            .attr("class", "annotation-group");
 
-        window.svg.append("g")
-            .attr("class", "annotation-group")
-            .call(makeAnnotations);
+        annotationGroup.selectAll("text")
+            .data(annotations)
+            .enter()
+            .append("text")
+            .attr("class", "annotation")
+            .attr("x", function(d) { return d.x + d.dx; })
+            .attr("y", function(d) { return d.y + d.dy; })
+            .text(function(d) { return d.note.title + ": " + d.note.label; });
     }
 
     function showBarChart() {
@@ -156,9 +162,9 @@
 
         // Aggregate data for the bar chart
         const nestedData = d3.nest()
-            .key(d => d.Make)
-            .key(d => d.EngineCylinders)
-            .rollup(values => d3.mean(values, d => d.AverageHighwayMPG))
+            .key(function(d) { return d.Make; })
+            .key(function(d) { return d.EngineCylinders; })
+            .rollup(function(values) { return d3.mean(values, function(d) { return d.AverageHighwayMPG; }); })
             .entries(chartData);
 
         // Add bars
@@ -167,17 +173,17 @@
                         .enter()
                         .append("g")
                         .attr("class", "bar")
-                        .attr("transform", d => `translate(${x0(d.key)},0)`);
+                        .attr("transform", function(d) { return `translate(${x0(d.key)},0)`; });
 
         bars.selectAll("rect")
-            .data(d => d.values)
+            .data(function(d) { return d.values; })
             .enter()
             .append("rect")
-            .attr("x", d => x1(d.key))
-            .attr("y", d => yBar(d.value))
+            .attr("x", function(d) { return x1(d.key); })
+            .attr("y", function(d) { return yBar(d.value); })
             .attr("width", x1.bandwidth())
-            .attr("height", d => height - yBar(d.value))
-            .style("fill", d => color(d.key));
+            .attr("height", function(d) { return height - yBar(d.value); })
+            .style("fill", function(d) { return color(d.key); });
 
         // Add legend title
         svg.append("text")
@@ -190,24 +196,24 @@
 
         // Add legend
         const legend = svg.selectAll(".legend")
-                          .data(x1.domain().sort((a, b) => a - b)) // Sort legend items by cylinder count
+                          .data(x1.domain().sort(function(a, b) { return a - b; })) // Sort legend items by cylinder count
                           .enter()
                           .append("g")
                           .attr("class", "legend")
-                          .attr("transform", (d, i) => `translate(${width + 20}, ${i * 20})`);
+                          .attr("transform", function(d, i) { return `translate(${width + 20}, ${i * 20})`; });
 
         legend.append("rect")
               .attr("x", 0)
               .attr("width", 18)
               .attr("height", 18)
-              .style("fill", d => color(d));
+              .style("fill", function(d) { return color(d); });
 
         legend.append("text")
               .attr("x", 24)
               .attr("y", 9)
               .attr("dy", ".35em")
               .style("text-anchor", "start")
-              .text(d => `${d} cylinders`);
+              .text(function(d) { return `${d} cylinders`; });
 
         // Add annotations
         createAnnotations();
@@ -238,10 +244,10 @@
            .data(chartData)
            .enter()
            .append('circle')
-           .attr('cx', d => xBubble(d.AverageCityMPG))
-           .attr('cy', d => yBubble(d.AverageHighwayMPG))
-           .attr('r', d => 2 + d.EngineCylinders)
-           .style('fill', d => {
+           .attr('cx', function(d) { return xBubble(d.AverageCityMPG); })
+           .attr('cy', function(d) { return yBubble(d.AverageHighwayMPG); })
+           .attr('r', function(d) { return 2 + d.EngineCylinders; })
+           .style('fill', function(d) {
                if (d.Fuel === 'Electricity') return 'green';
                if (d.Fuel === 'Diesel') return 'brown';
                if (d.Fuel === 'Gasoline') return 'blue';
@@ -265,20 +271,20 @@
                               .enter()
                               .append("g")
                               .attr("class", "legendFuel")
-                              .attr("transform", (d, i) => `translate(${width + 20}, ${i * 20})`);
+                              .attr("transform", function(d, i) { return `translate(${width + 20}, ${i * 20})`; });
 
         legendFuel.append("rect")
                   .attr("x", 0)
                   .attr("width", 18)
                   .attr("height", 18)
-                  .style("fill", (d, i) => fuelColors[i]);
+                  .style("fill", function(d, i) { return fuelColors[i]; });
 
         legendFuel.append("text")
                   .attr("x", 24)
                   .attr("y", 9)
                   .attr("dy", ".35em")
                   .style("text-anchor", "start")
-                  .text(d => d);
+                  .text(function(d) { return d; });
 
         // Add annotations
         createAnnotations();
@@ -290,16 +296,16 @@
 
         // Aggregate data for the stacked bar chart
         const nestedData = d3.nest()
-            .key(d => d.EngineCylinders)
-            .key(d => d.Fuel)
-            .rollup(values => values.length)
+            .key(function(d) { return d.EngineCylinders; })
+            .key(function(d) { return d.Fuel; })
+            .rollup(function(values) { return values.length; })
             .entries(chartData);
 
         // Prepare data for stacking
         const fuels = ['Electricity', 'Diesel', 'Gasoline'];
-        const stackData = nestedData.map(d => {
+        const stackData = nestedData.map(function(d) {
             const obj = { EngineCylinders: d.key };
-            d.values.forEach(v => {
+            d.values.forEach(function(v) {
                 obj[v.key] = v.value;
             });
             return obj;
@@ -307,18 +313,18 @@
 
         const stack = d3.stack()
             .keys(fuels)
-            .value((d, key) => d[key] || 0);
+            .value(function(d, key) { return d[key] || 0; });
 
         const series = stack(stackData);
 
         // Create scales
         const xStacked = d3.scaleBand()
-            .domain(stackData.map(d => d.EngineCylinders))
+            .domain(stackData.map(function(d) { return d.EngineCylinders; }))
             .range([0, width])
             .padding(0.1);
 
         const yStacked = d3.scaleLinear()
-            .domain([0, d3.max(stackData, d => d3.sum(fuels.map(f => d[f] || 0)))])
+            .domain([0, d3.max(stackData, function(d) { return d3.sum(fuels.map(function(f) { return d[f] || 0; })); })])
             .range([height, 0]);
 
         const colorStacked = d3.scaleOrdinal()
@@ -349,14 +355,14 @@
             .data(series)
             .enter()
             .append('g')
-            .attr('fill', d => colorStacked(d.key))
+            .attr('fill', function(d) { return colorStacked(d.key); })
             .selectAll('rect')
-            .data(d => d)
+            .data(function(d) { return d; })
             .enter()
             .append('rect')
-            .attr('x', d => xStacked(d.data.EngineCylinders))
-            .attr('y', d => yStacked(d[1]))
-            .attr('height', d => yStacked(d[0]) - yStacked(d[1]))
+            .attr('x', function(d) { return xStacked(d.data.EngineCylinders); })
+            .attr('y', function(d) { return yStacked(d[1]); })
+            .attr('height', function(d) { return yStacked(d[0]) - yStacked(d[1]); })
             .attr('width', xStacked.bandwidth());
 
         // Add legend title
@@ -374,20 +380,20 @@
             .enter()
             .append("g")
             .attr("class", "legend")
-            .attr("transform", (d, i) => `translate(${width + 20}, ${i * 20})`);
+            .attr("transform", function(d, i) { return `translate(${width + 20}, ${i * 20})`; });
 
         legend.append("rect")
             .attr("x", 0)
             .attr("width", 18)
             .attr("height", 18)
-            .style("fill", d => colorStacked(d));
+            .style("fill", function(d) { return colorStacked(d); });
 
         legend.append("text")
             .attr("x", 24)
             .attr("y", 9)
             .attr("dy", ".35em")
             .style("text-anchor", "start")
-            .text(d => d);
+            .text(function(d) { return d; });
 
         // Add annotations
         createAnnotations();
