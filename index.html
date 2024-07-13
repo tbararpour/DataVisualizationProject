@@ -4,7 +4,7 @@
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-svg-annotation/2.5.1/d3-annotation.min.js"></script>
     <style>
-        circle { fill: red; stroke: black; }
+        circle { stroke: black; }
         .annotation { font-size: 12px; font-family: Arial, sans-serif; }
     </style>
 </head>
@@ -21,7 +21,8 @@
                 AverageCityMPG: +d.AverageCityMPG,
                 AverageHighwayMPG: +d.AverageHighwayMPG,
                 EngineCylinders: +d.EngineCylinders,
-                Make: d.Make
+                Make: d.Make,
+                Fuel: d.Fuel
             };
         });
 
@@ -227,7 +228,36 @@
            .attr('cx', d => xBubble(d.AverageCityMPG))
            .attr('cy', d => yBubble(d.AverageHighwayMPG))
            .attr('r', d => 2 + d.EngineCylinders)
-           .style('fill', 'red');
+           .style('fill', d => {
+               if (d.Fuel === 'Electricity') return 'green';
+               if (d.Fuel === 'Diesel') return 'brown';
+               if (d.Fuel === 'Gasoline') return 'blue';
+               return 'gray'; // default color if Fuel is something else
+           });
+
+        // Add legend
+        const fuels = ['Electricity', 'Diesel', 'Gasoline'];
+        const fuelColors = ['green', 'brown', 'blue'];
+
+        const legend = svg.selectAll(".legend")
+                          .data(fuels)
+                          .enter()
+                          .append("g")
+                          .attr("class", "legend")
+                          .attr("transform", (d, i) => `translate(${width + 20}, ${i * 20})`);
+
+        legend.append("rect")
+              .attr("x", 0)
+              .attr("width", 18)
+              .attr("height", 18)
+              .style("fill", (d, i) => fuelColors[i]);
+
+        legend.append("text")
+              .attr("x", 24)
+              .attr("y", 9)
+              .attr("dy", ".35em")
+              .style("text-anchor", "start")
+              .text(d => d);
 
         // Add annotations
         createAnnotations();
@@ -267,7 +297,7 @@
                         .enter()
                         .append("g")
                         .attr("class", "arc")
-                        .attr("transform", `translate(${window.width / 2}, ${window.height / 2})`);
+                        .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
         arcs.append("path")
             .attr("d", arc)
