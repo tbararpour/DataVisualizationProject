@@ -58,7 +58,7 @@
         window.color = d3.scaleOrdinal(d3.schemeCategory10);
 
         // Create scales for bubble chart
-        window. = d3.scaleLog()
+        window.xBubble = d3.scaleLog()
                     .domain([10, 150])
                     .range([0, width * 0.75])
                     .base(10);
@@ -261,7 +261,7 @@
            .data(chartData)
            .enter()
            .append('circle')
-           .attr('cx', function(d) { return (d.AverageCityMPG); })
+           .attr('cx', function(d) { return xBubble(d.AverageCityMPG); })
            .attr('cy', function(d) { return yBubble(d.AverageHighwayMPG); })
            .attr('r', function(d) { return 2 + d.EngineCylinders; })
            .style('fill', function(d) {
