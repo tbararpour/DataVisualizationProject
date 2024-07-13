@@ -175,6 +175,15 @@
             .attr("height", d => 300 - yBar(d.value))
             .style("fill", d => color(d.key));
 
+        // Add legend title
+        svg.append("text")
+            .attr("class", "legend-title")
+            .attr("x", 600 + 20)
+            .attr("y", -10)
+            .attr("text-anchor", "start")
+            .style("font-weight", "bold")
+            .text("Cylinders");
+        
         // Add legend
         const legend = svg.selectAll(".legend")
                           .data(x1.domain())
@@ -235,6 +244,15 @@
            });
 
         // Add legend for Fuel types
+
+        svg.append("text")
+            .attr("class", "legend-title")
+            .attr("x", 650)
+            .attr("y", -10)
+            .attr("text-anchor", "start")
+            .style("font-weight", "bold")
+            .text("Fuel Types");
+        
         const fuels = ['Electricity', 'Diesel', 'Gasoline'];
         const fuelColors = ['green', 'brown', 'blue'];
 
