@@ -79,7 +79,7 @@
         showBarChart();
     }
 
-    function createAnnotations() {
+    function createAnnotationsBarChart() {
         // Define annotations
         const annotations = [
             {
@@ -108,6 +108,65 @@
             .text(function(d) { return d.note.title + ": " + d.note.label; });
     }
 
+function createAnnotationsCircles() {
+        // Define annotations
+        const annotations = [
+            {
+                note: {
+                    label: "Vehicles with 0 cylinders (electrical vehicles) have the highest speed",
+                    title: "Highest Highway Speed",
+                    wrap: 150
+                },
+                x: window.xBubble(10),
+                y: window.yBubble(110),
+                dy: 0,
+                dx: 0
+            }
+        ];
+
+        const annotationGroup = window.svg.append("g")
+            .attr("class", "annotation-group");
+
+        annotationGroup.selectAll("text")
+            .data(annotations)
+            .enter()
+            .append("text")
+            .attr("class", "annotation")
+            .attr("x", function(d) { return d.x + d.dx; })
+            .attr("y", function(d) { return d.y + d.dy; })
+            .text(function(d) { return d.note.title + ": " + d.note.label; });
+    }
+
+function createAnnotationsStackedBarChart() {
+        // Define annotations
+        const annotations = [
+            {
+                note: {
+                    label: "Vehicles with 0 cylinders (electrical vehicles) have the highest speed",
+                    title: "Highest Highway Speed",
+                    wrap: 150
+                },
+                x: xStacked(4),
+                y: yStacked(110),
+                dy: 0,
+                dx: 0
+            }
+        ];
+
+        const annotationGroup = window.svg.append("g")
+            .attr("class", "annotation-group");
+
+        annotationGroup.selectAll("text")
+            .data(annotations)
+            .enter()
+            .append("text")
+            .attr("class", "annotation")
+            .attr("x", function(d) { return d.x + d.dx; })
+            .attr("y", function(d) { return d.y + d.dy; })
+            .text(function(d) { return d.note.title + ": " + d.note.label; });
+    }
+
+    
     function showBarChart() {
         // Clear existing shapes and annotations
         svg.selectAll("*").remove();
@@ -210,7 +269,7 @@
               .text(function(d) { return `${d} cylinders`; });
 
         // Add annotations
-        createAnnotations();
+        createAnnotationsBarChart();
     }
 
     function showCircles() {
@@ -305,7 +364,7 @@
                   .text(function(d) { return d; });
 
         // Add annotations
-        createAnnotations();
+        createAnnotationsCircles();
     }
 
     function showStackedBarChart() {
@@ -438,7 +497,7 @@
             .text(function(d) { return d; });
 
         // Add annotations
-        createAnnotations();
+        createAnnotationsStackedBarChart();
     }
 
     </script>
