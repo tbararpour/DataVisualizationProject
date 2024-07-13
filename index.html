@@ -29,9 +29,9 @@
         window.chartData = data;
 
         // Set margins and dimensions
-        const margin = {top: 50, right: 150, bottom: 150, left: 50};
+        const margin = {top: 70, right: 150, bottom: 70, left: 70};
         const width = 1200; // 1300 - margins
-        const height = 500; // 600 - margins
+        const height = 400; // 500 - margins
 
         // Store dimensions globally
         window.width = width;
@@ -74,25 +74,6 @@
                       .attr('height', height + margin.top + margin.bottom)
                       .append('g')
                       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-        // Add x-axis
-        const xAxis = d3.axisBottom(x0);
-
-        svg.append('g')
-           .attr('transform', 'translate(0,' + height + ')')
-           .call(xAxis)
-           .selectAll("text")
-           .attr("y", 0)
-           .attr("x", 9)
-           .attr("dy", ".35em")
-           .attr("transform", "rotate(45)")
-           .style("text-anchor", "start");
-
-        // Add y-axis
-        const yAxis = d3.axisLeft(yBar);
-
-        svg.append('g')
-           .call(yAxis);
 
         // Show bar chart by default
         showBarChart();
@@ -142,6 +123,15 @@
         // Clear existing shapes and annotations
         svg.selectAll("*").remove();
 
+        // Add title
+        svg.append("text")
+           .attr("x", width / 2)
+           .attr("y", -30)
+           .attr("text-anchor", "middle")
+           .style("font-size", "20px")
+           .style("font-weight", "bold")
+           .text("Bar Chart: Average Highway MPG by Make and Cylinders");
+
         // Redraw axes
         const xAxis = d3.axisBottom(x0);
 
@@ -155,10 +145,25 @@
            .attr("transform", "rotate(45)")
            .style("text-anchor", "start");
 
+        svg.append('text')
+           .attr('x', width / 2)
+           .attr('y', height + 60)
+           .attr('text-anchor', 'middle')
+           .style('font-size', '14px')
+           .text('Make');
+
         const yAxis = d3.axisLeft(yBar);
 
         svg.append('g')
            .call(yAxis);
+
+        svg.append('text')
+           .attr('transform', 'rotate(-90)')
+           .attr('x', -height / 2)
+           .attr('y', -60)
+           .attr('text-anchor', 'middle')
+           .style('font-size', '14px')
+           .text('Average Highway MPG');
 
         // Aggregate data for the bar chart
         const nestedData = d3.nest()
@@ -223,6 +228,15 @@
         // Clear existing shapes and annotations
         svg.selectAll("*").remove();
 
+        // Add title
+        svg.append("text")
+           .attr("x", width / 2)
+           .attr("y", -30)
+           .attr("text-anchor", "middle")
+           .style("font-size", "20px")
+           .style("font-weight", "bold")
+           .text("Bubble Chart: City MPG vs Highway MPG by Fuel Type");
+
         // Redraw axes
         const xAxis = d3.axisBottom(xBubble)
                         .tickValues([10, 20, 50, 100])
@@ -232,12 +246,27 @@
            .attr('transform', 'translate(0,' + height + ')')
            .call(xAxis);
 
+        svg.append('text')
+           .attr('x', width / 2)
+           .attr('y', height + 60)
+           .attr('text-anchor', 'middle')
+           .style('font-size', '14px')
+           .text('Average City MPG');
+
         const yAxis = d3.axisLeft(yBubble)
                         .tickValues([10, 20, 50, 100])
                         .tickFormat(d3.format("~s"));
 
         svg.append('g')
            .call(yAxis);
+
+        svg.append('text')
+           .attr('transform', 'rotate(-90)')
+           .attr('x', -height / 2)
+           .attr('y', -60)
+           .attr('text-anchor', 'middle')
+           .style('font-size', '14px')
+           .text('Average Highway MPG');
 
         // Add circles
         svg.selectAll('circle')
@@ -294,6 +323,15 @@
         // Clear existing shapes and annotations
         svg.selectAll("*").remove();
 
+        // Add title
+        svg.append("text")
+           .attr("x", width / 2)
+           .attr("y", -30)
+           .attr("text-anchor", "middle")
+           .style("font-size", "20px")
+           .style("font-weight", "bold")
+           .text("Stacked Bar Chart: Number of Records by Cylinders and Fuel Type");
+
         // Aggregate data for the stacked bar chart
         const nestedData = d3.nest()
             .key(function(d) { return d.EngineCylinders; })
@@ -319,7 +357,7 @@
 
         // Create scales
         const xStacked = d3.scaleBand()
-            .domain(stackData.map(function(d) { return d.EngineCylinders; }))
+            .domain(stackData.map(function(d) { return d.EngineCylinders; }).sort(function(a, b) { return a - b; }))
             .range([0, width])
             .padding(0.1);
 
@@ -344,10 +382,25 @@
             .attr("transform", "rotate(45)")
             .style("text-anchor", "start");
 
+        svg.append('text')
+           .attr('x', width / 2)
+           .attr('y', height + 60)
+           .attr('text-anchor', 'middle')
+           .style('font-size', '14px')
+           .text('Engine Cylinders');
+
         const yAxis = d3.axisLeft(yStacked);
 
         svg.append('g')
             .call(yAxis);
+
+        svg.append('text')
+           .attr('transform', 'rotate(-90)')
+           .attr('x', -height / 2)
+           .attr('y', -60)
+           .attr('text-anchor', 'middle')
+           .style('font-size', '14px')
+           .text('Number of Records');
 
         // Add bars
         svg.append('g')
