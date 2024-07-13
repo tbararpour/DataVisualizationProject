@@ -37,26 +37,6 @@
         window.width = width;
         window.height = height;
 
-        // Create scales for bar chart
-        var makes = data.map(function(d) { return d.Make; }); // Extract the 'Make' values
-        window.x0 = d3.scaleBand()
-                      .domain(makes) // Set the domain to the 'Make' values
-                      .range([0, width]) // Set the range to span the chart width
-                      .paddingInner(0.1); // Add padding between the bands
-
-        window.x1 = d3.scaleBand()
-                      .domain(data.map(function(d) { return d.EngineCylinders; }).filter(function(value, index, self) {
-                          return self.indexOf(value) === index;
-                      }).sort(function(a, b) { return a - b; }))
-                      .range([0, x0.bandwidth()])
-                      .padding(0.05);
-
-        window.yBar = d3.scaleLinear()
-                     .domain([0, d3.max(data, function(d) { return d.AverageHighwayMPG; })])
-                     .range([height, 0]);
-
-        window.color = d3.scaleOrdinal(d3.schemeCategory10);
-
         // Create scales for bubble chart
         window.xBubble = d3.scaleLog()
                     .domain([10, 150])
@@ -182,6 +162,28 @@ function createAnnotationsStackedBarChart() {
         // Clear existing shapes and annotations
         svg.selectAll("*").remove();
 
+
+
+        // Create scales for bar chart
+        var makes = data.map(function(d) { return d.Make; }); // Extract the 'Make' values
+        x0 = d3.scaleBand()
+                      .domain(makes) // Set the domain to the 'Make' values
+                      .range([0, width]) // Set the range to span the chart width
+                      .paddingInner(0.1); // Add padding between the bands
+
+        x1 = d3.scaleBand()
+                      .domain(data.map(function(d) { return d.EngineCylinders; }).filter(function(value, index, self) {
+                          return self.indexOf(value) === index;
+                      }).sort(function(a, b) { return a - b; }))
+                      .range([0, x0.bandwidth()])
+                      .padding(0.05);
+
+        yBar = d3.scaleLinear()
+                     .domain([0, d3.max(data, function(d) { return d.AverageHighwayMPG; })])
+                     .range([height, 0]);
+
+        color = d3.scaleOrdinal(d3.schemeCategory10);
+        
         // Add title
         svg.append("text")
            .attr("x", width / 2)
