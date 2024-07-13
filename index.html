@@ -60,12 +60,12 @@
         // Create scales for bubble chart
         window.xBubble = d3.scaleLog()
                     .domain([10, 150])
-                    .range([0, width])
+                    .range([0, width * 0.75])
                     .base(10);
 
         window.yBubble = d3.scaleLog()
                     .domain([10, 150])
-                    .range([height, 0])
+                    .range([height * 0.75, 0])
                     .base(10);
 
         // Create SVG canvas
@@ -230,7 +230,7 @@
 
         // Add title
         svg.append("text")
-           .attr("x", width / 2)
+           .attr("x", (width * 0.75) / 2)
            .attr("y", -30)
            .attr("text-anchor", "middle")
            .style("font-size", "20px")
@@ -243,12 +243,12 @@
                         .tickFormat(d3.format("~s"));
 
         svg.append('g')
-           .attr('transform', 'translate(0,' + height + ')')
+           .attr('transform', 'translate(0,' + height * 0.75 + ')')
            .call(xAxis);
 
         svg.append('text')
-           .attr('x', width / 2)
-           .attr('y', height + 60)
+           .attr('x', (width * 0.75) / 2)
+           .attr('y', height * 0.75 + 60)
            .attr('text-anchor', 'middle')
            .style('font-size', '14px')
            .text('Average City MPG');
@@ -262,7 +262,7 @@
 
         svg.append('text')
            .attr('transform', 'rotate(-90)')
-           .attr('x', -height / 2)
+           .attr('x', -(height * 0.75) / 2)
            .attr('y', -60)
            .attr('text-anchor', 'middle')
            .style('font-size', '14px')
@@ -286,7 +286,7 @@
         // Add legend for Fuel types
         svg.append("text")
             .attr("class", "legend-title")
-            .attr("x", width + 20)
+            .attr("x", width * 0.75 + 20)
             .attr("y", -10)
             .attr("text-anchor", "start")
             .style("font-weight", "bold")
@@ -300,7 +300,7 @@
                               .enter()
                               .append("g")
                               .attr("class", "legendFuel")
-                              .attr("transform", function(d, i) { return `translate(${width + 20}, ${i * 20})`; });
+                              .attr("transform", function(d, i) { return `translate(${width * 0.75 + 20}, ${i * 20})`; });
 
         legendFuel.append("rect")
                   .attr("x", 0)
