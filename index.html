@@ -235,29 +235,29 @@
                return 'gray'; // default color if Fuel is something else
            });
 
-        // Add legend
+        // Add legend for Fuel types
         const fuels = ['Electricity', 'Diesel', 'Gasoline'];
         const fuelColors = ['green', 'brown', 'blue'];
 
-        const legend = svg.selectAll(".legend")
-                          .data(fuels)
-                          .enter()
-                          .append("g")
-                          .attr("class", "legend")
-                          .attr("transform", (d, i) => `translate(${width + 20}, ${i * 20})`);
+        const legendFuel = svg.selectAll(".legendFuel")
+                              .data(fuels)
+                              .enter()
+                              .append("g")
+                              .attr("class", "legendFuel")
+                              .attr("transform", (d, i) => `translate(${width + 20}, ${i * 20})`);
 
-        legend.append("rect")
-              .attr("x", 0)
-              .attr("width", 18)
-              .attr("height", 18)
-              .style("fill", (d, i) => fuelColors[i]);
+        legendFuel.append("rect")
+                  .attr("x", 0)
+                  .attr("width", 18)
+                  .attr("height", 18)
+                  .style("fill", (d, i) => fuelColors[i]);
 
-        legend.append("text")
-              .attr("x", 24)
-              .attr("y", 9)
-              .attr("dy", ".35em")
-              .style("text-anchor", "start")
-              .text(d => d);
+        legendFuel.append("text")
+                  .attr("x", 24)
+                  .attr("y", 9)
+                  .attr("dy", ".35em")
+                  .style("text-anchor", "start")
+                  .text(d => d);
 
         // Add annotations
         createAnnotations();
@@ -297,7 +297,7 @@
                         .enter()
                         .append("g")
                         .attr("class", "arc")
-                        .attr("transform", `translate(${width / 2}, ${height / 2})`);
+                        .attr("transform", `translate(${window.width / 2}, ${window.height / 2})`);
 
         arcs.append("path")
             .attr("d", arc)
