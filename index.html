@@ -34,6 +34,10 @@
         const width = 600;
         const height = 300;
 
+        // Store dimensions globally
+        window.width = width;
+        window.height = height;
+
         // Create scales for bar chart
         window.x0 = d3.scaleBand()
                       .domain(data.map(d => d.Make))
