@@ -58,7 +58,7 @@
         window.color = d3.scaleOrdinal(d3.schemeCategory10);
 
         // Create scales for bubble chart
-        window.xBubble = d3.scaleLog()
+        window. = d3.scaleLog()
                     .domain([10, 150])
                     .range([0, width * 0.75])
                     .base(10);
@@ -84,25 +84,13 @@
         const annotations = [
             {
                 note: {
-                    label: "This is a high efficiency vehicle",
-                    title: "High Efficiency",
+                    label: "Vehicles with 0 cylinders (electrical vehicles) have the highest speed",
                     wrap: 200
                 },
                 x: window.x0("BMW"),
                 y: window.yBar(50),
-                dy: -30,
-                dx: 30
-            },
-            {
-                note: {
-                    label: "This vehicle has a lot of cylinders",
-                    title: "High Cylinders",
-                    wrap: 200
-                },
-                x: window.x0("Ford"),
-                y: window.yBar(30),
-                dy: -30,
-                dx: 30
+                dy: 0,
+                dx: 0
             }
         ];
 
@@ -273,7 +261,7 @@
            .data(chartData)
            .enter()
            .append('circle')
-           .attr('cx', function(d) { return xBubble(d.AverageCityMPG); })
+           .attr('cx', function(d) { return (d.AverageCityMPG); })
            .attr('cy', function(d) { return yBubble(d.AverageHighwayMPG); })
            .attr('r', function(d) { return 2 + d.EngineCylinders; })
            .style('fill', function(d) {
