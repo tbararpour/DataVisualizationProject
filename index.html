@@ -165,7 +165,7 @@ function createAnnotationsStackedBarChart() {
 
 
         // Create scales for bar chart
-        var makes = data.map(function(d) { return d.Make; }); // Extract the 'Make' values
+        var makes = chartData.map(function(d) { return d.Make; }); // Extract the 'Make' values
         x0 = d3.scaleBand()
                       .domain(makes) // Set the domain to the 'Make' values
                       .range([0, width]) // Set the range to span the chart width
