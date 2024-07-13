@@ -11,7 +11,7 @@
     <button onclick="showBarChart()">Slide 1</button>
     <button onclick="showCircles()">Slide 2</button>
     <button onclick="showStackedBarChart()">Slide 3</button>
-    <svg width=1300 height=600></svg>
+    <svg width=1200 height=600></svg>
     <script>
     async function init() {
         // Load and parse the CSV data
@@ -330,7 +330,7 @@
            .attr("text-anchor", "middle")
            .style("font-size", "20px")
            .style("font-weight", "bold")
-           .text("Stacked Bar Chart: Number of Vehicles by Cylinders and Fuel Type");
+           .text("Stacked Bar Chart: Number of Records by Cylinders and Fuel Type");
 
         // Aggregate data for the stacked bar chart
         const nestedData = d3.nest()
@@ -358,12 +358,12 @@
         // Create scales
         const xStacked = d3.scaleBand()
             .domain(stackData.map(function(d) { return d.EngineCylinders; }).sort(function(a, b) { return a - b; }))
-            .range([0, width])
+            .range([0, width * 0.75])
             .padding(0.1);
 
         const yStacked = d3.scaleLinear()
             .domain([0, d3.max(stackData, function(d) { return d3.sum(fuels.map(function(f) { return d[f] || 0; })); })])
-            .range([height, 0]);
+            .range([height * 0.75, 0]);
 
         const colorStacked = d3.scaleOrdinal()
             .domain(fuels)
@@ -373,7 +373,7 @@
         const xAxis = d3.axisBottom(xStacked);
 
         svg.append('g')
-            .attr('transform', 'translate(0,' + height + ')')
+            .attr('transform', 'translate(0,' + height * 0.75 + ')')
             .call(xAxis)
             .selectAll("text")
             .attr("y", 0)
@@ -383,8 +383,8 @@
             .style("text-anchor", "start");
 
         svg.append('text')
-           .attr('x', width / 2)
-           .attr('y', height + 60)
+           .attr('x', (width * 0.75) / 2)
+           .attr('y', height * 0.75 + 60)
            .attr('text-anchor', 'middle')
            .style('font-size', '14px')
            .text('Engine Cylinders');
@@ -396,11 +396,11 @@
 
         svg.append('text')
            .attr('transform', 'rotate(-90)')
-           .attr('x', -height / 2)
+           .attr('x', -(height * 0.75) / 2)
            .attr('y', -60)
            .attr('text-anchor', 'middle')
            .style('font-size', '14px')
-           .text('Number of Vehicles');
+           .text('Number of Records');
 
         // Add bars
         svg.append('g')
@@ -421,7 +421,7 @@
         // Add legend title
         svg.append("text")
             .attr("class", "legend-title")
-            .attr("x", width + 20)
+            .attr("x", (width * 0.75) + 20)
             .attr("y", -10)
             .attr("text-anchor", "start")
             .style("font-weight", "bold")
@@ -433,7 +433,7 @@
             .enter()
             .append("g")
             .attr("class", "legend")
-            .attr("transform", function(d, i) { return `translate(${width + 20}, ${i * 20})`; });
+            .attr("transform", function(d, i) { return `translate(${(width * 0.75) + 20}, ${i * 20})`; });
 
         legend.append("rect")
             .attr("x", 0)
