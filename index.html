@@ -58,7 +58,7 @@ function createAnnotationsBarChart() {
                 wrap: 150
             },
             x: window.x0("BMW"),
-            y: window.yBar(110),
+            y: window.yBar(120),
             dy: 0,
             dx: 0
         }
@@ -90,73 +90,96 @@ function createAnnotationsBarChart() {
 
 
 function createAnnotationsCircles() {
-        // Define annotations
-        const annotations = [
-            {
-                note: {
-                    label: `Vehicles with higher number\nof cylinders usually have lower speeds`,
-                    title: "# of Cylinders vs Speed",
-                    wrap: 1
-                },
-                x: window.xBubble(11),
-                y: window.yBubble(40),
-                dy: 0,
-                dx: 0
+    // Define annotations
+    const annotations = [
+        {
+            note: {
+                label: "Vehicles with higher number\nof cylinders usually have lower speeds",
+                title: "Cylinders vs Speed",
+                wrap: 1
             },
-            {
-                note: {
-                    label: "Electric vehicles have the highest\nspeeds compared to gasoline and diesel vehicles.",
-                    title: "# of Cylinders vs Speed",
-                    wrap: 1
-                },
-                x: window.xBubble(70),
-                y: window.yBubble(60),
-                dy: 0,
-                dx: 0
-            }
-        ];
+            x: window.xBubble(11),
+            y: window.yBubble(50),
+            dy: 0,
+            dx: 0
+        },
+        {
+            note: {
+                label: "Electric vehicles have the highest\nspeeds compared to gasoline and diesel vehicles.",
+                title: "Cylinders vs Speed",
+                wrap: 1
+            },
+            x: window.xBubble(70),
+            y: window.yBubble(60),
+            dy: 0,
+            dx: 0
+        }
+    ];
 
-        const annotationGroup = window.svg.append("g")
-            .attr("class", "annotation-group");
+    const annotationGroup = window.svg.append("g")
+        .attr("class", "annotation-group");
 
-        annotationGroup.selectAll("text")
-            .data(annotations)
-            .enter()
-            .append("text")
+    annotations.forEach(annotation => {
+        const textGroup = annotationGroup.append("text")
             .attr("class", "annotation")
-            .attr("x", function(d) { return d.x + d.dx; })
-            .attr("y", function(d) { return d.y + d.dy; })
-            .text(function(d) { return d.note.title + ": " + d.note.label; });
-    }
+            .attr("x", annotation.x + annotation.dx)
+            .attr("y", annotation.y + annotation.dy);
+
+        textGroup.append("tspan")
+            .attr("x", annotation.x + annotation.dx)
+            .attr("dy", "1.2em")
+            .style("font-weight", "bold")
+            .text(annotation.note.title);
+
+        annotation.note.label.split('\n').forEach((line, i) => {
+            textGroup.append("tspan")
+                .attr("x", annotation.x + annotation.dx)
+                .attr("dy", i === 0 ? "1.2em" : "1em")
+                .text(line);
+        });
+    });
+}
+
 
 function createAnnotationsStackedBarChart() {
-        // Define annotations
-        const annotations = [
-            {
-                note: {
-                    label: "Vehicles with 0 cylinders\n(electrical vehicles) have the highest speed",
-                    title: "Highest Highway Speed",
-                    wrap: 150
-                },
-                x: 30,
-                y: 50,
-                dy: 0,
-                dx: 0
-            }
-        ];
+    // Define annotations
+    const annotations = [
+        {
+            note: {
+                label: "Most vehicles produced by different\ncompanies have 4 cylinders",
+                title: "Engine Cylinders",
+                wrap: 150
+            },
+            x: 40,
+            y: 60,
+            dy: 0,
+            dx: 0
+        }
+    ];
 
-        const annotationGroup = window.svg.append("g")
-            .attr("class", "annotation-group");
+    const annotationGroup = window.svg.append("g")
+        .attr("class", "annotation-group");
 
-        annotationGroup.selectAll("text")
-            .data(annotations)
-            .enter()
-            .append("text")
+    annotations.forEach(annotation => {
+        const textGroup = annotationGroup.append("text")
             .attr("class", "annotation")
-            .attr("x", function(d) { return d.x + d.dx; })
-            .attr("y", function(d) { return d.y + d.dy; })
-            .text(function(d) { return d.note.title + ": " + d.note.label; });
-    }
+            .attr("x", annotation.x + annotation.dx)
+            .attr("y", annotation.y + annotation.dy);
+
+        textGroup.append("tspan")
+            .attr("x", annotation.x + annotation.dx)
+            .attr("dy", "1.2em")
+            .style("font-weight", "bold")
+            .text(annotation.note.title);
+
+        annotation.note.label.split('\n').forEach((line, i) => {
+            textGroup.append("tspan")
+                .attr("x", annotation.x + annotation.dx)
+                .attr("dy", i === 0 ? "1.2em" : "1em")
+                .text(line);
+        });
+    });
+}
 
     
     function showBarChart() {
