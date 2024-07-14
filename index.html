@@ -437,10 +437,9 @@ function createAnnotationsStackedBarChart() {
             .attr('transform', 'translate(0,' + height * 0.75 + ')')
             .call(xAxis)
             .selectAll("text")
-            .attr("y", 10)
-            .attr("x", 0)
+            .attr("y", 12)
+            .attr("x", -5)
             .attr("dy", ".35em")
-            .attr("transform", "rotate(0)")
             .style("text-anchor", "start");
 
         svg.append('text')
