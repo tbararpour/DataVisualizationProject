@@ -48,34 +48,46 @@
         showBarChart();
     }
 
-    function createAnnotationsBarChart() {
-        // Define annotations
-        const annotations = [
-            {
-                note: {
-                    label: "Vehicles with 0 cylinders (electrical vehicles) have the highest speed",
-                    title: "Highest Highway Speed",
-                    wrap: 150
-                },
-                x: window.x0("BMW"),
-                y: window.yBar(110),
-                dy: 0,
-                dx: 0
-            }
-        ];
+function createAnnotationsBarChart() {
+    // Define annotations
+    const annotations = [
+        {
+            note: {
+                label: "Vehicles with 0 cylinders\n(electrical vehicles) have the highest speed",
+                title: "Highest Highway Speed",
+                wrap: 150
+            },
+            x: window.x0("BMW"),
+            y: window.yBar(110),
+            dy: 0,
+            dx: 0
+        }
+    ];
 
-        const annotationGroup = window.svg.append("g")
-            .attr("class", "annotation-group");
+    const annotationGroup = window.svg.append("g")
+        .attr("class", "annotation-group");
 
-        annotationGroup.selectAll("text")
-            .data(annotations)
-            .enter()
-            .append("text")
+    annotations.forEach(annotation => {
+        const textGroup = annotationGroup.append("text")
             .attr("class", "annotation")
-            .attr("x", function(d) { return d.x + d.dx; })
-            .attr("y", function(d) { return d.y + d.dy; })
-            .text(function(d) { return d.note.title + ": " + d.note.label; });
-    }
+            .attr("x", annotation.x + annotation.dx)
+            .attr("y", annotation.y + annotation.dy);
+
+        textGroup.append("tspan")
+            .attr("x", annotation.x + annotation.dx)
+            .attr("dy", "1.2em")
+            .style("font-weight", "bold")
+            .text(annotation.note.title);
+
+        annotation.note.label.split('\n').forEach((line, i) => {
+            textGroup.append("tspan")
+                .attr("x", annotation.x + annotation.dx)
+                .attr("dy", i === 0 ? "1.2em" : "1em")
+                .text(line);
+        });
+    });
+}
+
 
 function createAnnotationsCircles() {
         // Define annotations
