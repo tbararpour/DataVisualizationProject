@@ -37,17 +37,6 @@
         window.width = width;
         window.height = height;
 
-        // Create scales for bubble chart
-        window.xBubble = d3.scaleLog()
-                    .domain([10, 150])
-                    .range([0, width * 0.75])
-                    .base(10);
-
-        window.yBubble = d3.scaleLog()
-                    .domain([10, 150])
-                    .range([height * 0.75, 0])
-                    .base(10);
-
         // Create SVG canvas
         window.svg = d3.select('svg')
                       .attr('width', width + margin.left + margin.right)
@@ -289,6 +278,17 @@ function createAnnotationsStackedBarChart() {
         // Clear existing shapes and annotations
         svg.selectAll("*").remove();
 
+        // Create scales for bubble chart
+        xBubble = d3.scaleLog()
+                    .domain([10, 150])
+                    .range([0, width * 0.75])
+                    .base(10);
+
+        yBubble = d3.scaleLog()
+                    .domain([10, 150])
+                    .range([height * 0.75, 0])
+                    .base(10);
+        
         // Add title
         svg.append("text")
            .attr("x", (width * 0.75) / 2)
@@ -298,7 +298,7 @@ function createAnnotationsStackedBarChart() {
            .style("font-weight", "bold")
            .text("Bubble Chart: City MPG vs Highway MPG by Fuel Type");
 
-        // Redraw axes
+        // Draw axes
         const xAxis = d3.axisBottom(xBubble)
                         .tickValues([10, 20, 50, 100])
                         .tickFormat(d3.format("~s"));
