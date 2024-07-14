@@ -180,7 +180,7 @@ function createAnnotationsStackedBarChart() {
            .attr("text-anchor", "middle")
            .style("font-size", "20px")
            .style("font-weight", "bold")
-           .text("Bar Chart: Average Highway MPG by Make and Cylinders");
+           .text("Average Highway MPG by Make and Cylinders");
 
         // Redraw axes
         const xAxis = d3.axisBottom(x0);
@@ -296,7 +296,7 @@ function createAnnotationsStackedBarChart() {
            .attr("text-anchor", "middle")
            .style("font-size", "20px")
            .style("font-weight", "bold")
-           .text("Bubble Chart: City MPG vs Highway MPG by Fuel Type");
+           .text("City MPG vs Highway MPG by Fuel Type and Cylinders");
 
         // Draw axes
         const xAxis = d3.axisBottom(xBubble)
@@ -391,7 +391,7 @@ function createAnnotationsStackedBarChart() {
            .attr("text-anchor", "middle")
            .style("font-size", "20px")
            .style("font-weight", "bold")
-           .text("Stacked Bar Chart: Number of Records by Cylinders and Fuel Type");
+           .text("Number of Vehicles by Cylinders and Fuel Type");
 
         // Aggregate data for the stacked bar chart
         const nestedData = d3.nest()
@@ -440,7 +440,7 @@ function createAnnotationsStackedBarChart() {
             .attr("y", 0)
             .attr("x", 9)
             .attr("dy", ".35em")
-            .attr("transform", "rotate(90)")
+            .attr("transform", "rotate(0)")
             .style("text-anchor", "start");
 
         svg.append('text')
@@ -461,7 +461,7 @@ function createAnnotationsStackedBarChart() {
            .attr('y', -60)
            .attr('text-anchor', 'middle')
            .style('font-size', '14px')
-           .text('Number of Records');
+           .text('Number of Vehicles');
 
         // Add bars
         svg.append('g')
