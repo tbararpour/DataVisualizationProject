@@ -370,22 +370,38 @@ function createAnnotationsStackedBarChart() {
 
         // Add circles
         svg.selectAll('circle')
-           .data(chartData)
-           .enter()
-           .append('circle')
-           .attr('cx', function(d) { return xBubble(d.AverageCityMPG); })
-           .attr('cy', height * 0.75) // start from the bottom of the chart
-           .attr('r', 0) // start with radius 0
-           .style('fill', function(d) {
-               if (d.Fuel === 'Electricity') return 'green';
-               if (d.Fuel === 'Diesel') return 'brown';
-               if (d.Fuel === 'Gasoline') return 'blue';
-               return 'gray'; // default color if Fuel is something else
-           })
-           .transition() // add transition
-           .duration(3000).delay(500)
-           .attr('cy', function(d) { return yBubble(d.AverageHighwayMPG); }) // transition to final position
-           .attr('r', function(d) { return 2 + d.EngineCylinders; }); 
+            .data(chartData)
+            .enter()
+            .append('circle')
+            .attr('cx', function(d) { return xBubble(d.AverageCityMPG); })
+            .attr('cy', height * 0.75) // start from the bottom of the chart
+            .attr('r', 0) // start with radius 0
+            .style('fill', function(d) {
+                if (d.Fuel === 'Electricity') return 'green';
+                if (d.Fuel === 'Diesel') return 'brown';
+                if (d.Fuel === 'Gasoline') return 'blue';
+                return 'gray'; // default color if Fuel is something else
+            })
+            .style('opacity', 0) // start with opacity 0
+            .transition() // add transition
+            .duration(2000) // set duration to 2000 ms
+            .delay(function(d, i) { return i * 100; }) // add a delay for each circle
+            .ease(d3.easeElastic) // add elastic easing
+            .attr('cy', function(d) { return yBubble(d.AverageHighwayMPG); }) // transition to final position
+            .attr('r', function(d) { return 2 + d.EngineCylinders; }) // transition to final radius
+            .style('opacity', 1) // transition to opacity 1
+            .on('end', function() { // add pulsing effect after the initial transition
+                d3.select(this)
+                  .transition()
+                  .duration(1000)
+                  .attr('r', function(d) { return 2 + d.EngineCylinders + 2; }) // increase radius
+                  .transition()
+                  .duration(1000)
+                  .attr('r', function(d) { return 2 + d.EngineCylinders; }) // return to original radius
+                  .ease(d3.easeSin)
+                  .repeat(Infinity);
+            });
+
 
         // Add legend for Fuel types
         svg.append("text")
