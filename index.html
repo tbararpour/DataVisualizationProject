@@ -520,11 +520,14 @@ function createAnnotationsStackedBarChart() {
             .attr('y', height * 0.75) // start from the bottom of the chart
             .attr('height', 0) // start with height 0
             .attr('width', xStacked.bandwidth())
+            .style('opacity', 0) // start with opacity 0
             .transition() // add transition
-            .duration(3000).delay(500)
+            .duration(3000) // set duration to 3000 ms
+            .delay(function(d, i) { return i * 100; }) // add a delay for each bar
+            .ease(d3.easeElastic) // add elastic easing
             .attr('y', function(d) { return yStacked(d[1]); }) // transition to final position
-            .attr('height', function(d) { return yStacked(d[0]) - yStacked(d[1]); }); // transition to final height
-
+            .attr('height', function(d) { return yStacked(d[0]) - yStacked(d[1]); }) // transition to final height
+            .style('opacity', 1); // transition to opacity 1
 
         // Add legend title
         svg.append("text")
