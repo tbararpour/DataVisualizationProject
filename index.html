@@ -517,9 +517,14 @@ function createAnnotationsStackedBarChart() {
             .enter()
             .append('rect')
             .attr('x', function(d) { return xStacked(d.data.EngineCylinders); })
-            .attr('y', function(d) { return yStacked(d[1]); })
-            .attr('height', function(d) { return yStacked(d[0]) - yStacked(d[1]); })
-            .attr('width', xStacked.bandwidth());
+            .attr('y', height * 0.75) // start from the bottom of the chart
+            .attr('height', 0) // start with height 0
+            .attr('width', xStacked.bandwidth())
+            .transition() // add transition
+            .duration(3000).delay(500)
+            .attr('y', function(d) { return yStacked(d[1]); }) // transition to final position
+            .attr('height', function(d) { return yStacked(d[0]) - yStacked(d[1]); }); // transition to final height
+
 
         // Add legend title
         svg.append("text")
