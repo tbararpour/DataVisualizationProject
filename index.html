@@ -270,10 +270,14 @@ function createAnnotationsStackedBarChart() {
             .enter()
             .append("rect")
             .attr("x", function(d) { return x1(d.key); })
-            .attr("y", function(d) { return yBar(d.value); })
+            .attr("y", height) // start from bottom of the chart
             .attr("width", x1.bandwidth())
-            .attr("height", function(d) { return height - yBar(d.value); })
-            .style("fill", function(d) { return color(d.key); });
+            .attr("height", 0) // start with height 0
+            .style("fill", function(d) { return color(d.key); })
+            .transition() // add transition
+            .duration(3000).delay(1000)
+            .attr("y", function(d) { return yBar(d.value); }) // transition to final position
+            .attr("height", function(d) { return height - yBar(d.value); }); // transition to final height
 
         // Add legend title
         svg.append("text")
