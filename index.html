@@ -53,8 +53,8 @@ function createAnnotationsBarChart() {
     const annotations = [
         {
             note: {
-                label: "Vehicles with 0 cylinders\n(electrical vehicles) have the highest speed",
-                title: "Highest Highway Speed",
+                label: "Vehicles with 0 cylinders\n(electrical vehicles) have the highest highway fuel efficiency",
+                title: "Fuel Efficiency",
                 wrap: 150
             },
             x: window.x0("BMW"),
@@ -94,8 +94,8 @@ function createAnnotationsCircles() {
     const annotations = [
         {
             note: {
-                label: "Vehicles with higher number\nof cylinders usually have lower speeds",
-                title: "Cylinders vs Speed",
+                label: "Vehicles with higher number of cylinders\nusually have lower fuel efficiency",
+                title: "Cylinders vs Fuel Efficiency",
                 wrap: 1
             },
             x: window.xBubble(11),
@@ -105,8 +105,8 @@ function createAnnotationsCircles() {
         },
         {
             note: {
-                label: "Electric vehicles have the highest\nspeeds compared to gasoline and diesel vehicles.",
-                title: "Cylinders vs Speed",
+                label: "Electric vehicles have the highest fuel\nefficiencies compared to gasoline and diesel vehicles.",
+                title: "Electric vehicles",
                 wrap: 1
             },
             x: window.xBubble(70),
@@ -146,7 +146,7 @@ function createAnnotationsStackedBarChart() {
     const annotations = [
         {
             note: {
-                label: "Most vehicles produced by different\ncompanies have 4 cylinders",
+                label: "Most vehicles produced by different\ncompanies have 4 cylinders and run on Gasoline",
                 title: "Engine Cylinders",
                 wrap: 150
             },
