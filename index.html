@@ -10,23 +10,23 @@
 <body onload='init()'>
     <button onclick="showStackedBarChart()">Slide 1</button>
     <button onclick="showBarChart()">Slide 2</button>
-    <button onclick="showCircles()">Slide 3</button>
+    <button onclick="showBubbleChart()">Slide 3</button>
     <svg width=1200 height=600></svg>
      <div style="position: absolute; left: 20px; top: 700px;">
-    <label>
-    <input type="checkbox" id="animationToggle" checked> Enable Animation
-    </label>
+        <label>
+            <input type="checkbox" id="animationToggle" checked> Enable Animation
+        </label>
     </div>
     <script>
     async function init() {
-        // Load and parse the CSV data
+        // Load the CSV data
         const data = await d3.csv('https://flunky.github.io/cars2017.csv', function(d) {
             return {
                 AverageCityMPG: +d.AverageCityMPG,
                 AverageHighwayMPG: +d.AverageHighwayMPG,
                 EngineCylinders: +d.EngineCylinders,
-                Make: d.Make,
-                Fuel: d.Fuel
+                Make: +d.Make,
+                Fuel: +d.Fuel
             };
         });
 
@@ -35,8 +35,8 @@
 
         // Set margins and dimensions
         const margin = {top: 70, right: 150, bottom: 70, left: 70};
-        const width = 1200; // 1300 - margins
-        const height = 400; // 500 - margins
+        const width = 1200;
+        const height = 400;
 
         // Store dimensions globally
         window.width = width;
@@ -49,7 +49,7 @@
                       .append('g')
                       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-        // Show bar chart by default
+        // Show showStackedBarChart by default
         showStackedBarChart();
     }
 
@@ -97,7 +97,7 @@
         });
     }
 
-    function createAnnotationsCircles() {
+    function createAnnotationsBubbles() {
         // Define annotations
         const annotations = [
             {
@@ -189,15 +189,15 @@
     }
 
     function showBarChart() {
-        // Clear existing shapes and annotations
+        // Clear existing visualization
         svg.selectAll("*").remove();
 
         // Create scales for bar chart
         var makes = chartData.map(function(d) { return d.Make; }); // Extract the 'Make' values
         x0 = d3.scaleBand()
-                      .domain(makes) // Set the domain to the 'Make' values
-                      .range([0, width]) // Set the range to span the chart width
-                      .paddingInner(0.1); // Add padding between the bands
+                      .domain(makes)
+                      .range([0, width])
+                      .paddingInner(0.1);
 
         x1 = d3.scaleBand()
                       .domain(chartData.map(function(d) { return d.EngineCylinders; }).filter(function(value, index, self) {
@@ -221,7 +221,7 @@
            .style("font-weight", "bold")
            .text("Average Highway MPG by Make and Cylinders");
 
-        // Redraw axes
+        // Draw axes
         const xAxis = d3.axisBottom(x0);
 
         svg.append('g')
@@ -274,14 +274,14 @@
             .enter()
             .append("rect")
             .attr("x", function(d) { return x1(d.key); })
-            .attr("y", height) // start from bottom of the chart
+            .attr("y", height)
             .attr("width", x1.bandwidth())
-            .attr("height", 0) // start with height 0
+            .attr("height", 0)
             .style("fill", function(d) { return color(d.key); })
-            .transition() // add transition
+            .transition()
             .duration(isAnimationEnabled() ? 3000 : 0)
-            .attr("y", function(d) { return yBar(d.value); }) // transition to final position
-            .attr("height", function(d) { return height - yBar(d.value); }); // transition to final height
+            .attr("y", function(d) { return yBar(d.value); })
+            .attr("height", function(d) { return height - yBar(d.value); });
 
         // Add legend title
         svg.append("text")
@@ -294,7 +294,7 @@
 
         // Add legend
         const legend = svg.selectAll(".legend")
-                          .data(x1.domain().sort(function(a, b) { return a - b; })) // Sort legend items by cylinder count
+                          .data(x1.domain().sort(function(a, b) { return a - b; }))
                           .enter()
                           .append("g")
                           .attr("class", "legend")
@@ -313,15 +313,15 @@
               .style("text-anchor", "start")
               .text(function(d) { return `${d} cylinders`; });
 
-        // Add annotations
+        // Add annotation
         createAnnotationsBarChart();
     }
 
-    function showCircles() {
-        // Clear existing shapes and annotations
+    function showBubbleChart() {
+        
         svg.selectAll("*").remove();
 
-        // Create scales for bubble chart
+        // Create scales
         xBubble = d3.scaleLog()
                     .domain([10, 150])
                     .range([0, width * 0.75])
@@ -372,37 +372,37 @@
            .style('font-size', '14px')
            .text('Average Highway MPG');
 
-        // Add circles
+        // Add bubbles
         svg.selectAll('circle')
             .data(chartData)
             .enter()
             .append('circle')
             .attr('cx', function(d) { return xBubble(d.AverageCityMPG); })
-            .attr('cy', height * 0.75) // start from the bottom of the chart
-            .attr('r', 0) // start with radius 0
+            .attr('cy', height * 0.75)
+            .attr('r', 0)
             .style('fill', function(d) {
                 if (d.Fuel === 'Electricity') return 'green';
                 if (d.Fuel === 'Diesel') return 'brown';
                 if (d.Fuel === 'Gasoline') return 'blue';
-                return 'gray'; // default color if Fuel is something else
+                return 'gray';
             })
-            .style('opacity', 0) // start with opacity 0
-            .transition() // add transition
-            .duration(isAnimationEnabled() ? 2000 : 0) // set duration to 2000 ms
-            .delay(function(d, i) { return isAnimationEnabled() ? i * 100 : 0; }) // add a delay for each circle
-            .ease(d3.easeElastic) // add elastic easing
-            .attr('cy', function(d) { return yBubble(d.AverageHighwayMPG); }) // transition to final position
-            .attr('r', function(d) { return 2 + d.EngineCylinders; }) // transition to final radius
-            .style('opacity', 1) // transition to opacity 1
-            .on('end', function() { // add pulsing effect after the initial transition
+            .style('opacity', 0)
+            .transition()
+            .duration(isAnimationEnabled() ? 2000 : 0)
+            .delay(function(d, i) { return isAnimationEnabled() ? i * 100 : 0; })
+            .ease(d3.easeElastic)
+            .attr('cy', function(d) { return yBubble(d.AverageHighwayMPG); })
+            .attr('r', function(d) { return 2 + d.EngineCylinders; })
+            .style('opacity', 1)
+            .on('end', function() {
                 if (isAnimationEnabled()) {
                     d3.select(this)
                       .transition()
                       .duration(1000)
-                      .attr('r', function(d) { return 2 + d.EngineCylinders + 2; }) // increase radius
+                      .attr('r', function(d) { return 2 + d.EngineCylinders + 2; })
                       .transition()
                       .duration(1000)
-                      .attr('r', function(d) { return 2 + d.EngineCylinders; }) // return to original radius
+                      .attr('r', function(d) { return 2 + d.EngineCylinders; })
                       .ease(d3.easeSin)
                       .repeat(Infinity);
                 }
@@ -440,12 +440,12 @@
                   .style("text-anchor", "start")
                   .text(function(d) { return d; });
 
-        // Add annotations
-        createAnnotationsCircles();
+        // Add annotation
+        createAnnotationsBubbles();
     }
 
     function showStackedBarChart() {
-        // Clear existing shapes and annotations
+
         svg.selectAll("*").remove();
 
         // Add title
@@ -494,7 +494,7 @@
             .domain(fuels)
             .range(['green', 'brown', 'blue']);
 
-        // Redraw axes
+        // Draw axes
         const xAxis = d3.axisBottom(xStacked);
 
         svg.append('g')
@@ -538,17 +538,17 @@
             .enter()
             .append('rect')
             .attr('x', function(d) { return xStacked(d.data.EngineCylinders); })
-            .attr('y', height * 0.75) // start from the bottom of the chart
-            .attr('height', 0) // start with height 0
+            .attr('y', height * 0.75)
+            .attr('height', 0)
             .attr('width', xStacked.bandwidth())
-            .style('opacity', 0) // start with opacity 0
-            .transition() // add transition
-            .duration(isAnimationEnabled() ? 3000 : 0) // set duration to 3000 ms
-            .delay(function(d, i) { return isAnimationEnabled() ? i * 100 : 0; }) // add a delay for each bar
-            .ease(d3.easeElastic) // add elastic easing
-            .attr('y', function(d) { return yStacked(d[1]); }) // transition to final position
-            .attr('height', function(d) { return yStacked(d[0]) - yStacked(d[1]); }) // transition to final height
-            .style('opacity', 1); // transition to opacity 1
+            .style('opacity', 0)
+            .transition()
+            .duration(isAnimationEnabled() ? 3000 : 0)
+            .delay(function(d, i) { return isAnimationEnabled() ? i * 100 : 0; })
+            .ease(d3.easeElastic)
+            .attr('y', function(d) { return yStacked(d[1]); })
+            .attr('height', function(d) { return yStacked(d[0]) - yStacked(d[1]); })
+            .style('opacity', 1);
 
         // Add legend title
         svg.append("text")
@@ -580,7 +580,7 @@
             .style("text-anchor", "start")
             .text(function(d) { return d; });
 
-        // Add annotations
+        // Add annotation
         createAnnotationsStackedBarChart();
     }
 
