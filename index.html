@@ -279,7 +279,7 @@
             .attr("height", 0) // start with height 0
             .style("fill", function(d) { return color(d.key); })
             .transition() // add transition
-            .duration(isAnimationEnabled() ? 3000 : 0).delay(500)
+            .duration(isAnimationEnabled() ? 3000 : 0)
             .attr("y", function(d) { return yBar(d.value); }) // transition to final position
             .attr("height", function(d) { return height - yBar(d.value); }); // transition to final height
 
